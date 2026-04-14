@@ -1,0 +1,25 @@
+# --- Backend (Spring Boot / Gradle) ---
+.gradle/
+build/
+out/
+bin/
+.idea/
+*.iml
+.vscode/
+
+# --- Frontend (React / Node.js) ---
+# フロントエンドが frontend/ フォルダにある場合は、パスを指定します
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env*
+
+# --- Environment / Secrets (Common) ---
+.env
+.env.local
+.env.example  # これは除外せず、git add するのが一般的です
+*.log
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
