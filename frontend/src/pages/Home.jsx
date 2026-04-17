@@ -26,6 +26,11 @@ export default function Home() {
         }),
       });
 
+      if (!res.ok) {
+        alert("ただいまAIモデルが混み合っており、レシピを生成できませんでした。\n時間をおいて再度お試しください。");
+        return;
+      }
+
       const data = await res.json();
 
       navigate("/recipe", { state: data });

@@ -12,7 +12,8 @@ export default function RecipeDetail() {
     return <div>データがありません</div>;
   }
 
-  const [liked, setLiked] = useState(false);
+  // idが存在する（＝お気に入り一覧から来た、またはDBに保存済みのデータ）場合は初期状態をtrueにする
+  const [liked, setLiked] = useState(!!recipe.id);
   const handleLike = async () => {
     const newLiked = !liked;
     setLiked(newLiked); // 先にUI更新（UX良い）
@@ -49,9 +50,25 @@ export default function RecipeDetail() {
         </div>
 
         {/* タイトル */}
-        <h1 className="text-3xl font-bold text-green-800 mb-6 text-center">
+        <h1 className="text-3xl font-bold text-green-800 mb-4 text-center">
           {recipe.title}
         </h1>
+
+        {/* 節約・時短の指標（アイコン付き） */}
+        <div className="flex justify-center flex-wrap gap-6 mb-8 text-lg font-semibold text-gray-700 bg-green-50 p-4 rounded-xl">
+          {recipe.cookingTimeMinutes != null && (
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">⏱️</span>
+              <span>約 {recipe.cookingTimeMinutes} 分</span>
+            </div>
+          )}
+          {recipe.estimatedCostJpy != null && (
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">💴</span>
+              <span>約 {recipe.estimatedCostJpy} 円</span>
+            </div>
+          )}
+        </div>
 
         {/* 材料 */}
         <section className="mb-6">

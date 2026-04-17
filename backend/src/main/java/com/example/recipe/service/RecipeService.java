@@ -20,19 +20,22 @@ public class RecipeService {
     public RecipeResponse generateRecipe(List<String> ingredients) {
 
         String prompt = """
-                あなたはプロの料理研究家です。
+                あなたはプロの料理研究家です。大学生向けに、「節約・時短」を重視したレシピを提案してください。
 
                 以下の食材でレシピを作ってください:
                 %s
 
                 必ずJSON形式で出力してください。説明文は禁止。
                 料理は一品まででお願いします。
+                想定調理時間（分）と、想定材料費（日本円）も数値で出力してください。
 
                 {
                   "title": "料理名",
                   "ingredients": ["材料1", "材料2"],
                   "steps": ["手順1", "手順2"],
-                  "points": ["ポイント1", "ポイント2"]
+                  "points": ["ポイント1", "ポイント2"],
+                  "cookingTimeMinutes": 15,
+                  "estimatedCostJpy": 300
                 }
                 """.formatted(ingredients);
 

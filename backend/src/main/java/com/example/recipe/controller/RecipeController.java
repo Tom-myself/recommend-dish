@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.recipe.entity.RecipeRequest;
 import com.example.recipe.entity.RecipeResponse;
 import com.example.recipe.service.RecipeService;
+import com.example.recipe.service.FavoriteService;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 @RestController
 @RequestMapping("/api/recipe")
@@ -17,9 +19,11 @@ import com.example.recipe.service.RecipeService;
 public class RecipeController {
 
     private final RecipeService recipeService;
+    private final FavoriteService favoriteService;
 
-    public RecipeController(RecipeService recipeService) {
+    public RecipeController(RecipeService recipeService, FavoriteService favoriteService) {
         this.recipeService = recipeService;
+        this.favoriteService = favoriteService;
     }
 
     @PostMapping
@@ -30,11 +34,20 @@ public class RecipeController {
         return result;
     }
 
-    @PostMapping("/favorite")
+    @PostMapping("/favorites")
     public ResponseEntity<String> favorite(@RequestBody RecipeResponse recipe) {
-        // ここでお気に入りの処理を実装（例: データベースに保存）
+        Long dummyUserId = 1L; // 認証が未実装のため仮のユーザーIDを使用
+        favoriteService.toggleFavorite(dummyUserId, recipe, true);
         System.out.println("お気に入り登録: " + recipe.getTitle());
         return ResponseEntity.ok("お気に入りに登録しました");
+    }
+
+    @DeleteMapping("/favorites")
+    public ResponseEntity<String> unfavorite(@RequestBody RecipeResponse recipe) {
+        Long dummyUserId = 1L; // 認証が未実装のため仮のユーザーIDを使用
+        favoriteService.toggleFavorite(dummyUserId, recipe, false);
+        System.out.println("お気に入り解除: " + recipe.getTitle());
+        return ResponseEntity.ok("お気に入りを解除しました");
     }
     
 }

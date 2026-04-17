@@ -15,4 +15,6 @@ public class RecipeResponse {
     private List<String> ingredients;
     private List<String> steps;
     private List<String> points;
+    private Integer cookingTimeMinutes;
+    private Integer estimatedCostJpy;
 }
