@@ -24,11 +24,12 @@ public class FavoriteController {
 
     @GetMapping("/search")
     public ResponseEntity<List<com.example.recipe.dto.FavoriteRecipeDto>> searchFavorites(
-            @RequestParam Long userId,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String ingredient,
             @RequestParam(required = false) Integer maxTime,
             @RequestParam(required = false) Integer maxCost) {
+                
+        Long userId = (Long) org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         List<com.example.recipe.dto.FavoriteRecipeDto> results = favoriteService.searchFavorites(userId, title, ingredient, maxTime, maxCost);
         return ResponseEntity.ok(results);

@@ -1,10 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaHeart } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 export default function RecipeDetail() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext);
 
   const recipe = location.state;
 
@@ -23,6 +25,7 @@ export default function RecipeDetail() {
         method: newLiked ? "POST" : "DELETE",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(recipe),
       });

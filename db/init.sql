@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -50,7 +51,7 @@ CREATE TABLE IF NOT EXISTS favorites (
 );
 
 -- Insert dummy user to prevent FK violations when using dummyUserId=1
-INSERT INTO users (id, username, email) VALUES (1, 'dummy_user', 'dummy@example.com') ON CONFLICT DO NOTHING;
+INSERT INTO users (id, username, email, password_hash) VALUES (1, 'dummy_user', 'dummy@example.com', '$2a$10$hP.Z5X.H9Yn.J9DqT8Yf3e9xTj4Dk8iG9oD7L/1H4R8L7K5KJhCqO') ON CONFLICT DO NOTHING;
 
 -- ▼ デモ用の初期データ ▼
 INSERT INTO recipes (id, title, cooking_time_minutes, estimated_cost_jpy) VALUES 

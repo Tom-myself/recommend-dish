@@ -36,16 +36,16 @@ public class RecipeController {
 
     @PostMapping("/favorites")
     public ResponseEntity<String> favorite(@RequestBody RecipeResponse recipe) {
-        Long dummyUserId = 1L; // 認証が未実装のため仮のユーザーIDを使用
-        favoriteService.toggleFavorite(dummyUserId, recipe, true);
+        Long userId = (Long) org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        favoriteService.toggleFavorite(userId, recipe, true);
         System.out.println("お気に入り登録: " + recipe.getTitle());
         return ResponseEntity.ok("お気に入りに登録しました");
     }
 
     @DeleteMapping("/favorites")
     public ResponseEntity<String> unfavorite(@RequestBody RecipeResponse recipe) {
-        Long dummyUserId = 1L; // 認証が未実装のため仮のユーザーIDを使用
-        favoriteService.toggleFavorite(dummyUserId, recipe, false);
+        Long userId = (Long) org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        favoriteService.toggleFavorite(userId, recipe, false);
         System.out.println("お気に入り解除: " + recipe.getTitle());
         return ResponseEntity.ok("お気に入りを解除しました");
     }

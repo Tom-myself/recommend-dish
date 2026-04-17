@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 // ダミーデータ（APIからのデータがない場合やエラー時に、UIの動作を可視化するため）
 const dummyFavorites = [];
@@ -8,6 +9,7 @@ export default function FavoritesPage() {
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext);
 
   // 絞り込み用のステート
   const [filterIngredient, setFilterIngredient] = useState("");
@@ -18,13 +20,17 @@ export default function FavoritesPage() {
     setLoading(true);
     try {
       // URLパラメータの構築
-      const params = new URLSearchParams({ userId: 1 });
+      const params = new URLSearchParams();
       if (filterIngredient) params.append("ingredient", filterIngredient);
       if (filterMaxTime) params.append("maxTime", filterMaxTime);
       if (filterMaxCost) params.append("maxCost", filterMaxCost);
 
       const url = `http://localhost:8080/api/favorites/search?${params.toString()}`;
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
 
       if (response.ok) {
         const data = await response.json();

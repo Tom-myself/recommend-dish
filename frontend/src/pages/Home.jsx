@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import bg from "../../public/katie-smith-uQs1802D0CQ-unsplash.jpg"; // 自分の画像に変更
 import { IoIosSearch } from "react-icons/io";
 import { useLocation, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Home() {
   const [mode, setMode] = useState("ingredients");
@@ -9,6 +10,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { token } = useContext(AuthContext);
 
   const handleSearch = async () => {
     if (!query) return;
@@ -20,9 +22,10 @@ export default function Home() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
-          ingredients: query.split(","),
+          ingredients: typeof query === 'string' ? query.split(",") : query,
         }),
       });
 
