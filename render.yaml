@@ -13,13 +13,7 @@ services:
     dockerContext: ./backend
     dockerfilePath: ./backend/Dockerfile
     envVars:
-      # DB接続情報
-      - key: SPRING_DATASOURCE_URL
-        value: jdbc:postgresql://${recipe-db.host}:${recipe-db.port}/${recipe-db.databaseName}
-      - key: SPRING_DATASOURCE_USERNAME
-        value: ${recipe-db.user}
-      - key: SPRING_DATASOURCE_PASSWORD
-        value: ${recipe-db.password}
+      # DB接続情報 (Renderダッシュボードから手動で設定するためここは空にしておきます)
       # JWTやAPIのキー (Web設定画面から値を直接入れることでハードコードを防止)
       - key: JWT_SECRET
         sync: false # Renderのダッシュボードで手動設定
@@ -36,6 +30,10 @@ services:
     rootDir: frontend
     buildCommand: npm install && npx vite build
     staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://recipe-backend.onrender.com # デプロイ後、実際のバックエンドのURLに変更してください
+        value: https://recipe-backend.onrender.com # デプロイ後、ダッシュボードから実際のバックエンドURLに変更してください
