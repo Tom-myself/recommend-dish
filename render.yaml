@@ -1,4 +1,3 @@
-
 databases:
   - name: recipe-db
     databaseName: recipe_db
@@ -35,7 +34,7 @@ services:
     name: recipe-frontend
     env: static
     rootDir: frontend
-    buildCommand: npm install && npm run build
+    buildCommand: npm install && npx vite build
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_BASE_URL
