@@ -3,12 +3,14 @@ databases:
   - name: recipe-db
     databaseName: recipe_db
     user: admin
+    plan: free
 
 services:
   # 2. バックエンド (Spring Boot)
   - type: web
     name: recipe-backend
     env: docker
+    plan: free
     dockerContext: ./backend
     dockerfilePath: ./backend/Dockerfile
     envVars:
