@@ -1,0 +1,44 @@
+services:
+  # 1. データベース (PostgreSQL)
+  - type: pgbouncer # Native Postgres DB creation is available via Dashboard. Wait, Blueprint supports databases list.
+
+# render.yaml
+databases:
+  - name: recipe-db
+    databaseName: recipe_db
+    user: admin
+
+services:
+  # 2. バックエンド (Spring Boot)
+  - type: web
+    name: recipe-backend
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      # DB接続情報
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://${recipe-db.host}:${recipe-db.port}/${recipe-db.databaseName}
+      - key: SPRING_DATASOURCE_USERNAME
+        value: ${recipe-db.user}
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: ${recipe-db.password}
+      # JWTやAPIのキー (Web設定画面から値を直接入れることでハードコードを防止)
+      - key: JWT_SECRET
+        sync: false # Renderのダッシュボードで手動設定
+      - key: GOOGLE_API_KEY
+        sync: false # Renderのダッシュボードで手動設定
+      # CORS用
+      - key: FRONTEND_URL
+        value: https://recipe-frontend-yourname.onrender.com # 後でフロントのURLに合わせて変更
+
+  # 3. フロントエンド (Static Site)
+  - type: web
+    name: recipe-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://recipe-backend.onrender.com # デプロイ後、実際のバックエンドのURLに変更してください

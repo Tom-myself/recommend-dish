@@ -7,6 +7,7 @@ import { RiMoneyCnyCircleLine } from "react-icons/ri";
 import { BiDish } from "react-icons/bi";
 import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { API_BASE_URL } from "../api";
 
 export default function RecipeDetail() {
   const location = useLocation();
@@ -28,7 +29,7 @@ export default function RecipeDetail() {
     setLiked(newLiked); // 先にUI更新（UX良い）
 
     try {
-      await fetch("http://localhost:8080/api/recipe/favorites", {
+      await fetch(`${API_BASE_URL}/api/recipe/favorites`, {
         method: newLiked ? "POST" : "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -47,7 +48,7 @@ export default function RecipeDetail() {
     setCalories(null);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/recipe/calories",
+        `${API_BASE_URL}/api/recipe/calories`,
         {
           method: "POST",
           headers: {

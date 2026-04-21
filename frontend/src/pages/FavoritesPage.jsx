@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { IoIosTimer } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { API_BASE_URL } from "../api";
 
 // ダミーデータ（APIからのデータがない場合やエラー時に、UIの動作を可視化するため）
 const dummyFavorites = [];
@@ -26,7 +27,7 @@ export default function FavoritesPage() {
       if (filterMaxTime) params.append("maxTime", filterMaxTime);
       if (filterMaxCost) params.append("maxCost", filterMaxCost);
 
-      const url = `http://localhost:8080/api/favorites/search?${params.toString()}`;
+      const url = `${API_BASE_URL}/api/favorites/search?${params.toString()}`;
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -2,8 +2,8 @@ import { useState, useContext } from "react";
 import bg from "../../public/katie-smith-uQs1802D0CQ-unsplash.jpg"; // 自分の画像に変更
 import { IoIosSearch } from "react-icons/io";
 import { BiDish } from "react-icons/bi";
-import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { API_BASE_URL } from "../api";
 
 export default function Home() {
   const [mode, setMode] = useState("ingredients");
@@ -20,7 +20,10 @@ export default function Home() {
     setLoading(true); // ← 開始
 
     try {
-      const res = await fetch("http://localhost:8080/api/recipe", {
+      const endpoint =
+        mode === "ingredients" ? "/api/recipe" : "/api/recipe/keywords";
+
+      const res = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

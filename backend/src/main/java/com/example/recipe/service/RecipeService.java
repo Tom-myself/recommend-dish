@@ -1,7 +1,5 @@
 package com.example.recipe.service;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 
 import com.example.recipe.ai.GeminiClient;
@@ -21,8 +19,8 @@ public class RecipeService {
     public RecipeResponse generateRecipe(RecipeRequest request) {
 
         String ingredientsStr = request.getIngredients() != null ? request.getIngredients().toString() : "";
-        String utensilsCondition = (request.getUtensils() != null && !request.getUtensils().isBlank()) 
-                ? "調理器具の条件: " + request.getUtensils() 
+        String utensilsCondition = (request.getUtensils() != null && !request.getUtensils().isBlank())
+                ? "調理器具の条件: " + request.getUtensils()
                 : "調理器具の条件: 特に指定なし";
 
         String prompt = """

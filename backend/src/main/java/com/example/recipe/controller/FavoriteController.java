@@ -1,7 +1,6 @@
 package com.example.recipe.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,10 +27,12 @@ public class FavoriteController {
             @RequestParam(required = false) String ingredient,
             @RequestParam(required = false) Integer maxTime,
             @RequestParam(required = false) Integer maxCost) {
-                
-        Long userId = (Long) org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        List<com.example.recipe.dto.FavoriteRecipeDto> results = favoriteService.searchFavorites(userId, title, ingredient, maxTime, maxCost);
+        Long userId = (Long) org.springframework.security.core.context.SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        List<com.example.recipe.dto.FavoriteRecipeDto> results = favoriteService.searchFavorites(userId, title,
+                ingredient, maxTime, maxCost);
         return ResponseEntity.ok(results);
     }
 }
