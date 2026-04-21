@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import { IoIosTimer } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
@@ -28,8 +29,8 @@ export default function FavoritesPage() {
       const url = `http://localhost:8080/api/favorites/search?${params.toString()}`;
       const response = await fetch(url, {
         headers: {
-          "Authorization": `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (response.ok) {
@@ -76,44 +77,48 @@ export default function FavoritesPage() {
   if (loading) {
     // 画面ロード中の表示
     return (
-      <div className="min-h-screen bg-[#f5f1e6] p-6 flex justify-center items-center">
-        <p className="text-xl text-green-800 font-bold">読み込み中...</p>
+      <div className="min-h-screen bg-[#F4F7F4] p-6 flex justify-center items-center">
+        <p className="text-xl text-[#166534] font-bold">読み込み中...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f1e6] p-6">
+    <div className="min-h-screen bg-[#F4F7F4] py-8 px-4 sm:px-6 lg:px-8">
       {/* トップへ戻るボタン */}
       <button
         onClick={() => navigate("/")}
-        className="mb-6 text-green-800 hover:underline font-semibold"
+        className="mb-8 flex items-center gap-2 text-[#4A634E] hover:text-[#166534] font-medium transition-colors max-w-6xl mx-auto w-full"
       >
-        ← ホームへ戻る
+        <span className="text-xl">←</span> ホームへ戻る
       </button>
 
-      <h1 className="text-3xl font-bold text-green-800 mb-8 text-center">
+      <h1 className="text-3xl md:text-4xl font-black text-[#1F291E] mb-8 text-center tracking-tight">
         お気に入りレシピ
       </h1>
 
       {/* 絞り込みフォーム */}
-      <div className="max-w-4xl mx-auto bg-white p-6 rounded-2xl shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-end">
-        <div className="flex-1 w-full">
-          <label className="block text-sm font-semibold text-gray-700 mb-1">材料で検索</label>
+      <div className="max-w-4xl mx-auto bg-[#FDFDFB] p-8 rounded-[2rem] border border-[#E2E8E0] mb-12 flex flex-col md:flex-row gap-6 items-end">
+        <div className="flex-1 w-full flex flex-col gap-2">
+          <label className="block text-sm font-bold text-[#4A634E] ml-1">
+            材料で検索
+          </label>
           <input
             type="text"
             value={filterIngredient}
             onChange={(e) => setFilterIngredient(e.target.value)}
             placeholder="例: 鶏肉、玉ねぎ"
-            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
+            className="w-full bg-[#FAFBF9] border border-[#E2E8E0] rounded-xl px-4 py-3 text-[#1F291E] focus:outline-none focus:border-[#166534] focus:ring-1 focus:ring-[#166534] transition-colors"
           />
         </div>
-        <div className="flex-1 w-full">
-          <label className="block text-sm font-semibold text-gray-700 mb-1">調理時間</label>
+        <div className="flex-1 w-full flex flex-col gap-2">
+          <label className="block text-sm font-bold text-[#4A634E] ml-1">
+            調理時間
+          </label>
           <select
             value={filterMaxTime}
             onChange={(e) => setFilterMaxTime(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
+            className="w-full bg-[#FAFBF9] border border-[#E2E8E0] rounded-xl px-4 py-3 text-[#1F291E] focus:outline-none focus:border-[#166534] focus:ring-1 focus:ring-[#166534] transition-colors"
           >
             <option value="">指定なし</option>
             <option value="5">5分以下</option>
@@ -123,12 +128,14 @@ export default function FavoritesPage() {
             <option value="60">60分以下</option>
           </select>
         </div>
-        <div className="flex-1 w-full">
-          <label className="block text-sm font-semibold text-gray-700 mb-1">想定材料費</label>
+        <div className="flex-1 w-full flex flex-col gap-2">
+          <label className="block text-sm font-bold text-[#4A634E] ml-1">
+            想定材料費
+          </label>
           <select
             value={filterMaxCost}
             onChange={(e) => setFilterMaxCost(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
+            className="w-full bg-[#FAFBF9] border border-[#E2E8E0] rounded-xl px-4 py-3 text-[#1F291E] focus:outline-none focus:border-[#166534] focus:ring-1 focus:ring-[#166534] transition-colors"
           >
             <option value="">指定なし</option>
             <option value="300">300円以下</option>
@@ -139,7 +146,7 @@ export default function FavoritesPage() {
         </div>
         <button
           onClick={fetchFavorites}
-          className="w-full md:w-auto bg-green-700 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-800 transition shadow-sm"
+          className="w-full md:w-auto bg-[#166534] text-white font-bold py-3 px-8 rounded-full hover:bg-[#14532D] shadow-sm transition-all"
         >
           絞り込む
         </button>
@@ -151,34 +158,31 @@ export default function FavoritesPage() {
           <div
             key={recipe.id || recipe.title}
             onClick={() => handleCardClick(recipe)}
-            // カーソルを合わせた時に少し浮き上がるようなアニメーション(hover:scale)を付与
-            className="bg-[#fafaf8] rounded-2xl shadow-md p-6 cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+            // M3 Outlined Card properties
+            className="bg-[#FDFDFB] rounded-[2rem] border border-[#E2E8E0] p-6 sm:p-8 cursor-pointer hover:bg-[#E8EDE5]/30 hover:border-[#CFD8CD] transition-colors focus:ring-2 focus:ring-[#166534] focus:outline-none flex flex-col h-full group"
+            tabIndex={0}
           >
-            <h2 className="text-xl font-bold text-green-700 mb-4">
+            <h2 className="text-xl font-bold text-[#1F291E] leading-tight mb-6 line-clamp-2 break-normal group-hover:text-[#166534] transition-colors">
               {recipe.title}
             </h2>
 
-            <div className="text-sm text-gray-600 space-y-2">
-              <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100">
-                {/* 調理時間 */}
-                {recipe.cookingTimeMinutes != null && (
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <span className="text-xl">⏱️</span>
-                    <span className="font-medium">
-                      約 {recipe.cookingTimeMinutes} 分
-                    </span>
-                  </div>
-                )}
-                {/* 想定材料費 */}
-                {recipe.estimatedCostJpy != null && (
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <span className="text-xl">💴</span>
-                    <span className="font-medium">
-                      約 {recipe.estimatedCostJpy} 円
-                    </span>
-                  </div>
-                )}
-              </div>
+            <div className="flex flex-wrap gap-2 mt-auto">
+              {/* 調理時間 */}
+              {recipe.cookingTimeMinutes != null && (
+                <div className="flex items-center gap-1.5 bg-[#F4F7F4] text-[#4A634E] px-3 py-1.5 rounded-lg text-sm font-bold">
+                  <span>
+                    <IoIosTimer />
+                  </span>
+                  <span>{recipe.cookingTimeMinutes} 分</span>
+                </div>
+              )}
+              {/* 想定材料費 */}
+              {recipe.estimatedCostJpy != null && (
+                <div className="flex items-center gap-1.5 bg-[#F4F7F4] text-[#4A634E] px-3 py-1.5 rounded-lg text-sm font-bold">
+                  <span></span>
+                  <span>{recipe.estimatedCostJpy} 円</span>
+                </div>
+              )}
             </div>
           </div>
         ))}

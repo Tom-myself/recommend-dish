@@ -2,6 +2,7 @@ package com.example.recipe.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import java.util.Map;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +30,7 @@ public class RecipeController {
     @PostMapping
     public RecipeResponse generate(@RequestBody RecipeRequest request) {
 
-        RecipeResponse result = recipeService.generateRecipe(request.getIngredients());
+        RecipeResponse result = recipeService.generateRecipe(request);
 
         return result;
     }
@@ -49,5 +50,10 @@ public class RecipeController {
         System.out.println("お気に入り解除: " + recipe.getTitle());
         return ResponseEntity.ok("お気に入りを解除しました");
     }
-    
+
+    @PostMapping("/calories")
+    public ResponseEntity<Map<String, String>> calculateCalories(@RequestBody RecipeResponse recipe) {
+        String calories = recipeService.calculateCalories(recipe);
+        return ResponseEntity.ok(Map.of("calories", calories));
+    }
 }

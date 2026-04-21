@@ -35,47 +35,47 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center">
-      <div className="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-green-800 mb-6">ログイン</h2>
+    <div className="min-h-[85vh] flex items-center justify-center bg-[#F4F7F4] px-4">
+      <div className="bg-[#FDFDFB] p-8 md:p-10 rounded-[2rem] border border-[#E2E8E0] shadow-sm w-full max-w-md">
+        <h2 className="text-3xl font-black text-center text-[#1F291E] mb-8">ログイン</h2>
         
         {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">
+          <div className="bg-[#FCE8E8] text-[#991B1B] p-4 rounded-xl mb-6 text-sm font-medium">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">ユーザー名</label>
+            <label className="block text-sm font-bold text-[#4A634E] ml-1 mb-2">ユーザー名</label>
             <input
               type="text"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
+              className="w-full bg-[#FAFBF9] border border-[#E2E8E0] rounded-xl px-4 py-3 text-[#1F291E] focus:outline-none focus:border-[#166534] focus:ring-1 focus:ring-[#166534] transition-colors"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">パスワード</label>
+            <label className="block text-sm font-bold text-[#4A634E] ml-1 mb-2">パスワード</label>
             <input
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
+              className="w-full bg-[#FAFBF9] border border-[#E2E8E0] rounded-xl px-4 py-3 text-[#1F291E] focus:outline-none focus:border-[#166534] focus:ring-1 focus:ring-[#166534] transition-colors"
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-green-600 text-white font-bold py-2 rounded-lg hover:bg-green-700 transition shadow-sm mt-4"
+            className="w-full bg-[#166534] text-white font-bold py-3.5 rounded-full hover:bg-[#14532D] shadow-sm transition-all mt-4"
           >
             ログイン
           </button>
         </form>
         
-        <div className="mt-6 text-center text-sm text-gray-500">
-          アカウントをお持ちでないですか？ <Link to="/register" className="text-green-600 hover:underline">新規登録</Link>
+        <div className="mt-8 text-center text-sm font-medium text-[#4A634E]">
+          アカウントをお持ちでないですか？ <Link to="/register" className="text-[#166534] hover:underline">新規登録</Link>
         </div>
       </div>
     </div>

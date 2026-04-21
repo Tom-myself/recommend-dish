@@ -9,7 +9,6 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Many;
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface FavoriteMapper {

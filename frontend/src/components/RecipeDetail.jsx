@@ -1,5 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaHeart } from "react-icons/fa";
+import { CiCalculator1 } from "react-icons/ci";
+import { IoIosTimer } from "react-icons/io";
+import { MdOutlineTipsAndUpdates } from "react-icons/md";
+import { RiMoneyCnyCircleLine } from "react-icons/ri";
+import { BiDish } from "react-icons/bi";
 import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
@@ -16,6 +21,8 @@ export default function RecipeDetail() {
 
   // idが存在する（＝お気に入り一覧から来た、またはDBに保存済みのデータ）場合は初期状態をtrueにする
   const [liked, setLiked] = useState(!!recipe.id);
+  const [calories, setCalories] = useState(null);
+  const [isCalculating, setIsCalculating] = useState(false);
   const handleLike = async () => {
     const newLiked = !liked;
     setLiked(newLiked); // 先にUI更新（UX良い）
@@ -25,7 +32,7 @@ export default function RecipeDetail() {
         method: newLiked ? "POST" : "DELETE",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(recipe),
       });
@@ -35,72 +42,164 @@ export default function RecipeDetail() {
     }
   };
 
+  const handleCalculateCalories = async () => {
+    setIsCalculating(true);
+    setCalories(null);
+    try {
+      const response = await fetch(
+        "http://localhost:8080/api/recipe/calories",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(recipe),
+        },
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setCalories(data.calories);
+      } else {
+        setCalories("計算エラー");
+      }
+    } catch (err) {
+      console.error(err);
+      setCalories("計算エラー");
+    } finally {
+      setIsCalculating(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#f5f1e6] p-6">
+    <div className="min-h-screen bg-[#F4F7F4] py-8 px-4 sm:px-6 lg:px-8">
       {/* 戻る */}
       <button
         onClick={() => navigate(-1)}
-        className="mb-4 text-green-800 hover:underline"
+        className="mb-6 flex items-center gap-2 text-[#4A634E] hover:text-[#166534] font-medium transition-colors max-w-3xl mx-auto w-full"
       >
-        ← 戻る
+        <span className="text-xl">←</span> 戻る
       </button>
 
-      <div className="max-w-3xl mx-auto bg-[#fafaf8] rounded-3xl shadow-xl p-8">
-        <div className="flex justify-end mb-4">
-          <button onClick={handleLike} className="text-2xl transition">
-            <FaHeart className={liked ? "text-red-500" : "text-gray-300"} />
+      <div className="max-w-5xl mx-auto bg-[#FDFDFB] rounded-[2rem] shadow-sm border border-[#E2E8E0] p-8 md:p-12">
+        <div className="flex justify-end mb-6">
+          <button
+            onClick={handleLike}
+            className={`text-3xl transition-all flex items-center justify-center p-3 rounded-full hover:bg-[#FCE8E8] shrink-0 ${
+              liked ? "text-red-500 scale-110" : "text-[#A3B8A6]"
+            }`}
+          >
+            <FaHeart />
           </button>
         </div>
 
-        {/* タイトル */}
-        <h1 className="text-3xl font-bold text-green-800 mb-4 text-center">
-          {recipe.title}
-        </h1>
+        {/* トップの2カラム（クックパッド風：画像の代わりに情報＋材料表示） */}
+        <div className="flex flex-col md:flex-row gap-10 mb-12">
+          {/* 左側：タイトルと主要メタデータ */}
+          <div className="md:w-7/12 flex flex-col justify-start">
+            <h1 className="text-3xl md:text-4xl font-black text-[#1F291E] tracking-tight leading-tight mb-6 border-b border-[#E2E8E0] pb-6">
+              {recipe.title}
+            </h1>
 
-        {/* 節約・時短の指標（アイコン付き） */}
-        <div className="flex justify-center flex-wrap gap-6 mb-8 text-lg font-semibold text-gray-700 bg-green-50 p-4 rounded-xl">
-          {recipe.cookingTimeMinutes != null && (
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">⏱️</span>
-              <span>約 {recipe.cookingTimeMinutes} 分</span>
+            {/* サムネイル画像プレースホルダー */}
+            <div className="w-full aspect-video bg-[#E8EDE5] rounded-2xl flex items-center justify-center text-6xl text-[#A3B8A6] mb-6 shadow-sm border border-[#CFD8CD]">
+              <BiDish />
             </div>
-          )}
-          {recipe.estimatedCostJpy != null && (
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">💴</span>
-              <span>約 {recipe.estimatedCostJpy} 円</span>
+
+            {/* 節約・時短の指標（アイコン付き） */}
+            <div className="flex flex-wrap gap-3">
+              {recipe.cookingTimeMinutes != null && (
+                <div className="flex items-center gap-2 bg-[#E8EDE5] text-[#2B3229] px-4 py-2 rounded-lg font-bold text-sm">
+                  <span className="text-xl">
+                    <IoIosTimer />
+                  </span>
+                  <span>{recipe.cookingTimeMinutes} 分</span>
+                </div>
+              )}
+              {recipe.estimatedCostJpy != null && (
+                <div className="flex items-center gap-2 bg-[#E8EDE5] text-[#2B3229] px-4 py-2 rounded-lg font-bold text-sm">
+                  <span className="text-xl">
+                    <RiMoneyCnyCircleLine />
+                  </span>
+                  <span>{recipe.estimatedCostJpy} 円</span>
+                </div>
+              )}
+              <div className="flex items-center gap-2 bg-[#E8EDE5] text-[#2B3229] px-4 py-2 rounded-lg font-bold text-sm">
+                <span className="text-xl text-[#B45309]">
+                  <CiCalculator1 />
+                </span>
+                {calories ? (
+                  <span>約 {calories}</span>
+                ) : (
+                  <button
+                    onClick={handleCalculateCalories}
+                    disabled={isCalculating}
+                    className="text-[#B45309] hover:underline disabled:opacity-50 disabled:no-underline"
+                  >
+                    {isCalculating ? "計算中..." : "AIカロリー計算"}
+                  </button>
+                )}
+              </div>
             </div>
-          )}
+          </div>
+
+          {/* 右側：材料リスト */}
+          <div className="md:w-5/12">
+            <section className="bg-[#FAFBF9] border border-[#E2E8E0] p-6 rounded-2xl h-full">
+              <h2 className="text-2xl font-bold text-[#1F291E] mb-6 pb-2 border-b-2 border-[#166534] inline-block">
+                材料
+              </h2>
+              <ul className="space-y-4">
+                {recipe.ingredients.map((item, i) => (
+                  <li
+                    key={i}
+                    className="flex justify-between items-end border-b border-dotted border-[#CFD8CD] pb-2"
+                  >
+                    <span className="text-[#2B3229] font-medium leading-relaxed">
+                      {item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </div>
         </div>
 
-        {/* 材料 */}
-        <section className="mb-6">
-          <h2 className="text-xl font-semibold text-green-700 mb-2">材料</h2>
-          <ul className="list-disc list-inside space-y-1">
-            {recipe.ingredients.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
-          </ul>
-        </section>
-
         {/* 手順 */}
-        <section className="mb-6">
-          <h2 className="text-xl font-semibold text-green-700 mb-2">手順</h2>
-          <ol className="list-decimal list-inside space-y-2">
+        <section className="mb-10">
+          <h2 className="text-xl font-bold text-[#1F291E] mb-6 pb-2 border-b-2 border-[#166534] inline-block">
+            作り方
+          </h2>
+          <ol className="space-y-6">
             {recipe.steps.map((step, i) => (
-              <li key={i}>{step}</li>
+              <li key={i} className="flex gap-4">
+                <div className="flex-shrink-0 w-8 h-8 bg-[#166534] text-white rounded-full flex items-center justify-center font-bold text-sm mt-1">
+                  {i + 1}
+                </div>
+                <p className="text-[#2B3229] leading-relaxed pt-1 flex-1 border-b border-[#E2E8E0] pb-6">
+                  {step}
+                </p>
+              </li>
             ))}
           </ol>
         </section>
 
         {/* ポイント */}
-        <section>
-          <h2 className="text-xl font-semibold text-green-700 mb-2">
-            ポイント
+        <section className="bg-[#E8EDE5] p-6 rounded-2xl">
+          <h2 className="text-lg font-bold text-[#166534] mb-3 flex items-center gap-2">
+            <span className="text-xl">
+              <MdOutlineTipsAndUpdates />
+            </span>
+            コツ・ポイント
           </h2>
-          <ul className="list-disc list-inside space-y-1">
+          <ul className="list-disc list-inside space-y-2">
             {recipe.points.map((point, i) => (
-              <li key={i}>{point}</li>
+              <li
+                key={i}
+                className="text-[#2B3229] font-medium leading-relaxed"
+              >
+                {point}
+              </li>
             ))}
           </ul>
         </section>

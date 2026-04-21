@@ -1,5 +1,11 @@
 import React, { useContext } from "react";
-import { BrowserRouter, Route, Routes, Navigate, Outlet } from "react-router-dom";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  Navigate,
+  Outlet,
+} from "react-router-dom";
 import Home from "./pages/Home";
 import FavoritesPage from "./pages/FavoritesPage";
 import "./App.css";
@@ -22,11 +28,11 @@ function App() {
       <BrowserRouter>
         <div className="min-h-screen bg-gray-50 flex flex-col">
           <Header />
-          <main className="flex-1 p-4 md:p-8 relative w-full h-full">
+          <main className="flex-1 relative w-full h-full">
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              
+
               <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/recipe" element={<RecipeDetail />} />

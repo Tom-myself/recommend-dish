@@ -7,7 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.recipe.entity.Recipe;
+import com.example.recipe.entity.RecipeIngredient;
+import com.example.recipe.entity.RecipePoint;
 import com.example.recipe.entity.RecipeResponse;
+import com.example.recipe.entity.RecipeStep;
 import com.example.recipe.repository.FavoriteMapper;
 import com.example.recipe.repository.RecipeMapper;
 import com.example.recipe.dto.FavoriteRecipeDto;
@@ -40,28 +43,28 @@ public class FavoriteService {
             recipeMapper.insert(recipe);
 
             if (recipeResponse.getIngredients() != null && !recipeResponse.getIngredients().isEmpty()) {
-                List<com.example.recipe.entity.RecipeIngredient> ingredients = new ArrayList<>();
+                List<RecipeIngredient> ingredients = new ArrayList<>();
                 int order = 0;
                 for (String ing : recipeResponse.getIngredients()) {
-                    ingredients.add(new com.example.recipe.entity.RecipeIngredient(null, recipe.getId(), ing, order++));
+                    ingredients.add(new RecipeIngredient(null, recipe.getId(), ing, order++));
                 }
                 recipeMapper.insertIngredients(ingredients);
             }
 
             if (recipeResponse.getSteps() != null && !recipeResponse.getSteps().isEmpty()) {
-                List<com.example.recipe.entity.RecipeStep> steps = new ArrayList<>();
+                List<RecipeStep> steps = new ArrayList<>();
                 int order = 1;
                 for (String step : recipeResponse.getSteps()) {
-                    steps.add(new com.example.recipe.entity.RecipeStep(null, recipe.getId(), step, order++));
+                    steps.add(new RecipeStep(null, recipe.getId(), step, order++));
                 }
                 recipeMapper.insertSteps(steps);
             }
 
             if (recipeResponse.getPoints() != null && !recipeResponse.getPoints().isEmpty()) {
-                List<com.example.recipe.entity.RecipePoint> points = new ArrayList<>();
+                List<RecipePoint> points = new ArrayList<>();
                 int order = 0;
                 for (String point : recipeResponse.getPoints()) {
-                    points.add(new com.example.recipe.entity.RecipePoint(null, recipe.getId(), point, order++));
+                    points.add(new RecipePoint(null, recipe.getId(), point, order++));
                 }
                 recipeMapper.insertPoints(points);
             }

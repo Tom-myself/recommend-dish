@@ -50,34 +50,4 @@ CREATE TABLE IF NOT EXISTS favorites (
     CONSTRAINT unique_user_recipe UNIQUE (user_id, recipe_id)
 );
 
--- Insert dummy user to prevent FK violations when using dummyUserId=1
-INSERT INTO users (id, username, email, password_hash) VALUES (1, 'dummy_user', 'dummy@example.com', '$2a$10$hP.Z5X.H9Yn.J9DqT8Yf3e9xTj4Dk8iG9oD7L/1H4R8L7K5KJhCqO') ON CONFLICT DO NOTHING;
 
--- ▼ デモ用の初期データ ▼
-INSERT INTO recipes (id, title, cooking_time_minutes, estimated_cost_jpy) VALUES 
-(1, '鶏肉と野菜の黒酢あん炒め', 15, 350),
-(2, '簡単！レンチン豚もやし', 5, 200),
-(3, 'とろとろオムライス', 20, 280)
-ON CONFLICT (id) DO NOTHING;
-
-SELECT setval('recipes_id_seq', (SELECT MAX(id) FROM recipes));
-
-INSERT INTO recipe_ingredients (recipe_id, name, sort_order) VALUES
-(1, '鶏もも肉', 1), (1, '玉ねぎ', 2), (1, 'にんじん', 3), (1, 'ピーマン', 4), (1, '黒酢', 5),
-(2, '豚バラ肉', 1), (2, 'もやし', 2), (2, 'ポン酢', 3), (2, 'ネギ', 4),
-(3, '卵', 1), (3, 'ご飯', 2), (3, 'ケチャップ', 3), (3, '鶏肉', 4), (3, '玉ねぎ', 5);
-
-INSERT INTO recipe_steps (recipe_id, description, step_number) VALUES
-(1, '野菜を切る', 1), (1, '鶏肉を炒める', 2), (1, '野菜を加える', 3), (1, '黒酢あんを絡める', 4),
-(2, '耐熱皿にもやしを敷く', 1), (2, '豚肉を乗せる', 2), (2, 'レンジで5分加熱', 3), (2, 'ポン酢をかける', 4),
-(3, 'チキンライスを作る', 1), (3, '卵を半熟に焼く', 2), (3, 'ご飯の上に乗せる', 3);
-
-INSERT INTO recipe_points (recipe_id, description, sort_order) VALUES
-(1, '強火で一気に炒める', 1),
-(2, '豚肉が重ならないように広げる', 1),
-(3, '卵は火を通しすぎない', 1);
-
--- 初期お気に入り登録
-INSERT INTO favorites (user_id, recipe_id) VALUES 
-(1, 1), (1, 2), (1, 3)
-ON CONFLICT DO NOTHING;

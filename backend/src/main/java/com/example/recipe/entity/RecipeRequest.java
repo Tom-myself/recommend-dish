@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class RecipeRequest {
 
     private List<String> ingredients;
+    private String utensils;
 }
