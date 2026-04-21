@@ -36,4 +36,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://recipe-backend.onrender.com # デプロイ後、ダッシュボードから実際のバックエンドURLに変更してください
+        value: https://recipe-backend-e2s9.onrender.com # デプロイ後、ダッシュボードから実際のバックエンドURLに変更してください
