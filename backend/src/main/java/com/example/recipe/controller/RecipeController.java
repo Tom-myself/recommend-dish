@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 
 @RestController
 @RequestMapping("/api/recipe")
-@CrossOrigin(origins = "http://localhost:3000")
 public class RecipeController {
 
     private final RecipeService recipeService;
