@@ -27,7 +27,7 @@ services:
         sync: false # Renderのダッシュボードで手動設定
       # CORS用
       - key: FRONTEND_URL
-        value: https://recipe-frontend-yourname.onrender.com # 後でフロントのURLに合わせて変更
+        value: https://recipe-frontend-12lp.onrender.com # 実際のフロントエンドURL
 
   # 3. フロントエンド (Static Site)
   - type: web
