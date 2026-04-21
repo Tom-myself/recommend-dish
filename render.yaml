@@ -1,8 +1,4 @@
-services:
-  # 1. データベース (PostgreSQL)
-  - type: pgbouncer # Native Postgres DB creation is available via Dashboard. Wait, Blueprint supports databases list.
 
-# render.yaml
 databases:
   - name: recipe-db
     databaseName: recipe_db
