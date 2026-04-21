@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import bg from "../../public/katie-smith-uQs1802D0CQ-unsplash.jpg"; // 自分の画像に変更
 import { IoIosSearch } from "react-icons/io";
 import { BiDish } from "react-icons/bi";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { API_BASE_URL } from "../api";
 
