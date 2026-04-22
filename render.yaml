@@ -17,7 +17,7 @@ services:
       # JWTやAPIのキー (Web設定画面から値を直接入れることでハードコードを防止)
       - key: JWT_SECRET
         sync: false # Renderのダッシュボードで手動設定
-      - key: GEMINI_API_KEY
+      - key: GOOGLE_API_KEY
         sync: false # Renderのダッシュボードで手動設定
       # CORS用
       - key: FRONTEND_URL
