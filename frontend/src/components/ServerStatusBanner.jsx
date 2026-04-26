@@ -17,36 +17,35 @@ export default function ServerStatusBanner() {
   const [msgIndex, setMsgIndex] = useState(0);
   const checkIntervalRef = useRef(null);
   const msgIntervalRef = useRef(null);
-
-  const checkServer = async () => {
-    try {
-      await fetch(`${API_BASE_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
-        signal: AbortSignal.timeout(3000),
-      });
-      // どんなステータスコードでも応答があればサーバー起動済み
-      markReady();
-    } catch {
-      // ネットワークエラー or タイムアウト = サーバー未起動
-      setServerReady(false);
-    }
-  };
+  const isCheckingRef = useRef(false);
 
   const markReady = () => {
     clearInterval(checkIntervalRef.current);
     clearInterval(msgIntervalRef.current);
     setFading(true);
-    setTimeout(() => setServerReady(true), 700); // フェードアウト後に非表示
+    setTimeout(() => setServerReady(true), 700);
+  };
+
+  const checkServer = async () => {
+    if (isCheckingRef.current) return;
+    isCheckingRef.current = true;
+
+    try {
+      await fetch(`${API_BASE_URL}/api/health`, {
+        method: 'GET',
+        signal: AbortSignal.timeout(60000), 
+      });
+      markReady();
+    } catch (err) {
+      setServerReady(false);
+    } finally {
+      isCheckingRef.current = false;
+    }
   };
 
   useEffect(() => {
-    // 初回チェック
     checkServer();
-    // 4秒ごとに再チェック
-    checkIntervalRef.current = setInterval(checkServer, 4000);
-    // 2.5秒ごとにメッセージを切り替え
+    checkIntervalRef.current = setInterval(checkServer, 5000);
     msgIntervalRef.current = setInterval(() => {
       setMsgIndex((i) => (i + 1) % MESSAGES.length);
     }, 2500);

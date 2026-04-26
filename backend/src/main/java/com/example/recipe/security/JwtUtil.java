@@ -18,7 +18,7 @@ public class JwtUtil {
     // application.properties
     @Value("${JWT_SECRET}")
     private String secretKey;
-    private final long JWT_EXPIRATION = 60000; // 1 day
+    private final long JWT_EXPIRATION = 60 * 60 * 1000; // 1 hour
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));

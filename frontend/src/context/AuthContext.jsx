@@ -1,7 +1,16 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { API_BASE_URL } from '../api';
 
 export const AuthContext = createContext();
+
+/** JWTのペイロードをbase64デコードして有効期限を取得 */
+function getTokenExpiry(token) {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000; // ミリ秒に変換
+  } catch {
+    return null;
+  }
+}
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -14,36 +23,24 @@ export const AuthProvider = ({ children }) => {
     const storedUsername = localStorage.getItem('username');
 
     if (!storedToken || !storedUsername) {
-      // トークンがなければそのままローディング完了
       setLoading(false);
       return;
     }
 
-    // トークンの有効性をバックエンドで検証する
-    fetch(`${API_BASE_URL}/api/favorites`, {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${storedToken}` },
-    })
-      .then((res) => {
-        if (res.status === 401 || res.status === 403) {
-          // セッション切れ → ストレージをクリアしてログアウト状態へ
-          localStorage.removeItem('token');
-          localStorage.removeItem('username');
-          setSessionExpired(true);
-        } else {
-          // 有効なトークン → ログイン状態を復元
-          setToken(storedToken);
-          setUser({ username: storedUsername });
-        }
-      })
-      .catch(() => {
-        // ネットワークエラーなど → 楽観的に復元（オフライン対応）
-        setToken(storedToken);
-        setUser({ username: storedUsername });
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    // クライアント側でJWTの有効期限を確認（ネットワーク不要）
+    const expiry = getTokenExpiry(storedToken);
+    if (!expiry || Date.now() >= expiry) {
+      // 期限切れ → ストレージをクリアしてセッション切れフラグをセット
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      setSessionExpired(true);
+    } else {
+      // 有効なトークン → ログイン状態を復元
+      setToken(storedToken);
+      setUser({ username: storedUsername });
+    }
+
+    setLoading(false);
   }, []);
 
   const login = (token, username) => {

@@ -3,6 +3,7 @@ import { IoIosTimer } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { API_BASE_URL } from "../api";
+import FavoriteAIAssistant from "../components/FavoriteAIAssistant";
 
 // ダミーデータ（APIからのデータがない場合やエラー時に、UIの動作を可視化するため）
 const dummyFavorites = [];
@@ -98,59 +99,65 @@ export default function FavoritesPage() {
         お気に入りレシピ
       </h1>
 
-      {/* 絞り込みフォーム */}
-      <div className="max-w-4xl mx-auto bg-[#FDFDFB] p-8 rounded-[2rem] border border-[#E2E8E0] mb-12 flex flex-col md:flex-row gap-6 items-end">
-        <div className="flex-1 w-full flex flex-col gap-2">
-          <label className="block text-sm font-bold text-[#4A634E] ml-1">
-            材料で検索
-          </label>
-          <input
-            type="text"
-            value={filterIngredient}
-            onChange={(e) => setFilterIngredient(e.target.value)}
-            placeholder="例: 鶏肉、玉ねぎ"
-            className="w-full bg-[#FAFBF9] border border-[#E2E8E0] rounded-xl px-4 py-3 text-[#1F291E] focus:outline-none focus:border-[#166534] focus:ring-1 focus:ring-[#166534] transition-colors"
-          />
-        </div>
-        <div className="flex-1 w-full flex flex-col gap-2">
-          <label className="block text-sm font-bold text-[#4A634E] ml-1">
-            調理時間
-          </label>
-          <select
-            value={filterMaxTime}
-            onChange={(e) => setFilterMaxTime(e.target.value)}
-            className="w-full bg-[#FAFBF9] border border-[#E2E8E0] rounded-xl px-4 py-3 text-[#1F291E] focus:outline-none focus:border-[#166534] focus:ring-1 focus:ring-[#166534] transition-colors"
+      {/* 検索フォーム + AIアシスタントボタン */}
+      <div className="max-w-5xl mx-auto flex items-start gap-3 mb-12">
+        <div className="flex-1 bg-[#FDFDFB] p-8 rounded-[2rem] border border-[#E2E8E0] flex flex-col md:flex-row gap-6 items-end">
+          <div className="flex-1 w-full flex flex-col gap-2">
+            <label className="block text-sm font-bold text-[#4A634E] ml-1">
+              材料で検索
+            </label>
+            <input
+              type="text"
+              value={filterIngredient}
+              onChange={(e) => setFilterIngredient(e.target.value)}
+              placeholder="例: 鶏肉、玉ねぎ"
+              className="w-full bg-[#FAFBF9] border border-[#E2E8E0] rounded-xl px-4 py-3 text-[#1F291E] focus:outline-none focus:border-[#166534] focus:ring-1 focus:ring-[#166534] transition-colors"
+            />
+          </div>
+          <div className="flex-1 w-full flex flex-col gap-2">
+            <label className="block text-sm font-bold text-[#4A634E] ml-1">
+              調理時間
+            </label>
+            <select
+              value={filterMaxTime}
+              onChange={(e) => setFilterMaxTime(e.target.value)}
+              className="w-full bg-[#FAFBF9] border border-[#E2E8E0] rounded-xl px-4 py-3 text-[#1F291E] focus:outline-none focus:border-[#166534] focus:ring-1 focus:ring-[#166534] transition-colors"
+            >
+              <option value="">指定なし</option>
+              <option value="5">5分以下</option>
+              <option value="10">10分以下</option>
+              <option value="15">15分以下</option>
+              <option value="30">30分以下</option>
+              <option value="60">60分以下</option>
+            </select>
+          </div>
+          <div className="flex-1 w-full flex flex-col gap-2">
+            <label className="block text-sm font-bold text-[#4A634E] ml-1">
+              想定材料費
+            </label>
+            <select
+              value={filterMaxCost}
+              onChange={(e) => setFilterMaxCost(e.target.value)}
+              className="w-full bg-[#FAFBF9] border border-[#E2E8E0] rounded-xl px-4 py-3 text-[#1F291E] focus:outline-none focus:border-[#166534] focus:ring-1 focus:ring-[#166534] transition-colors"
+            >
+              <option value="">指定なし</option>
+              <option value="300">300円以下</option>
+              <option value="500">500円以下</option>
+              <option value="800">800円以下</option>
+              <option value="1000">1000円以下</option>
+            </select>
+          </div>
+          <button
+            onClick={fetchFavorites}
+            className="w-full md:w-auto bg-[#166534] text-white font-bold py-3 px-8 rounded-full hover:bg-[#14532D] shadow-sm transition-all"
           >
-            <option value="">指定なし</option>
-            <option value="5">5分以下</option>
-            <option value="10">10分以下</option>
-            <option value="15">15分以下</option>
-            <option value="30">30分以下</option>
-            <option value="60">60分以下</option>
-          </select>
+            絞り込む
+          </button>
         </div>
-        <div className="flex-1 w-full flex flex-col gap-2">
-          <label className="block text-sm font-bold text-[#4A634E] ml-1">
-            想定材料費
-          </label>
-          <select
-            value={filterMaxCost}
-            onChange={(e) => setFilterMaxCost(e.target.value)}
-            className="w-full bg-[#FAFBF9] border border-[#E2E8E0] rounded-xl px-4 py-3 text-[#1F291E] focus:outline-none focus:border-[#166534] focus:ring-1 focus:ring-[#166534] transition-colors"
-          >
-            <option value="">指定なし</option>
-            <option value="300">300円以下</option>
-            <option value="500">500円以下</option>
-            <option value="800">800円以下</option>
-            <option value="1000">1000円以下</option>
-          </select>
+        {/* AIアシスタントボタン（検索フォームの右横） */}
+        <div className="pt-1 flex flex-end">
+          <FavoriteAIAssistant favorites={favorites} />
         </div>
-        <button
-          onClick={fetchFavorites}
-          className="w-full md:w-auto bg-[#166534] text-white font-bold py-3 px-8 rounded-full hover:bg-[#14532D] shadow-sm transition-all"
-        >
-          絞り込む
-        </button>
       </div>
 
       {/* レシピをグリッド形式（カード一覧）で並べるコンテナ */}
