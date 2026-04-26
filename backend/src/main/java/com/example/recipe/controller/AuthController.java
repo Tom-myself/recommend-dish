@@ -23,17 +23,17 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        if (userMapper.findByUsername(request.getUsername()) != null) {
+        if (userMapper.findByUsername(request.username()) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");
         }
-        if (userMapper.findByEmail(request.getEmail()) != null) {
+        if (userMapper.findByEmail(request.email()) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already exists");
         }
 
         User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setUsername(request.username());
+        user.setEmail(request.email());
+        user.setPasswordHash(passwordEncoder.encode(request.password()));
 
         userMapper.insert(user);
 
@@ -43,9 +43,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        User user = userMapper.findByUsername(request.getUsername());
+        User user = userMapper.findByUsername(request.username());
 
-        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+        if (user == null || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
 

@@ -13,12 +13,13 @@ import RecipeDetail from "./components/RecipeDetail";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Header from "./components/Header";
+import ServerStatusBanner from "./components/ServerStatusBanner";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 
 const ProtectedRoute = () => {
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading, sessionExpired } = useContext(AuthContext);
   if (loading) return <div className="p-8 text-center">Loading...</div>;
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to={sessionExpired ? "/login?expired=true" : "/login"} replace />;
   return <Outlet />;
 };
 
@@ -41,6 +42,7 @@ function App() {
             </Routes>
           </main>
         </div>
+          <ServerStatusBanner />
       </BrowserRouter>
     </AuthProvider>
   );

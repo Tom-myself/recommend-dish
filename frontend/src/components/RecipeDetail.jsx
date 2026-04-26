@@ -47,17 +47,14 @@ export default function RecipeDetail() {
     setIsCalculating(true);
     setCalories(null);
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/recipe/calories`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(recipe),
+      const response = await fetch(`${API_BASE_URL}/api/recipe/calories`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify(recipe),
+      });
       if (response.ok) {
         const data = await response.json();
         setCalories(data.calories);
@@ -77,7 +74,7 @@ export default function RecipeDetail() {
       {/* 戻る */}
       <button
         onClick={() => navigate(-1)}
-        className="mb-6 flex items-center gap-2 text-[#4A634E] hover:text-[#166534] font-medium transition-colors max-w-3xl mx-auto w-full"
+        className="mb-6 flex items-center gap-2 text-[#4A634E] hover:text-[#166534] font-medium transition-colors max-w-5xl mx-auto w-full"
       >
         <span className="text-xl">←</span> 戻る
       </button>

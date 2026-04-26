@@ -41,7 +41,6 @@ export default function Header() {
                     <span className="font-bold text-[#1F291E]">
                       {user.username}
                     </span>
-                    さん
                   </span>
                   <button
                     onClick={handleLogout}
