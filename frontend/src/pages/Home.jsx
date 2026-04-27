@@ -28,7 +28,7 @@ export default function Home() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           ingredients: typeof query === "string" ? query.split(",") : query,
@@ -45,7 +45,10 @@ export default function Home() {
 
       const data = await res.json();
 
-      navigate("/recipe", { state: data });
+      // sessionStorageにレシピを保存し、一意なIDでURLを構築
+      const recipeId = crypto.randomUUID();
+      sessionStorage.setItem(`recipe_${recipeId}`, JSON.stringify(data));
+      navigate(`/recipe/${recipeId}`);
     } catch (err) {
       console.error("エラー:", err);
     } finally {

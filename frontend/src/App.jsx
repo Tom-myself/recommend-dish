@@ -34,9 +34,12 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
 
+              {/* 誰でもアクセス可能 */}
+              <Route path="/" element={<Home />} />
+              <Route path="/recipe/:id" element={<RecipeDetail />} />
+
+              {/* ログインが必要なページ */}
               <Route element={<ProtectedRoute />}>
-                <Route path="/" element={<Home />} />
-                <Route path="/recipe" element={<RecipeDetail />} />
                 <Route path="/favorites" element={<FavoritesPage />} />
               </Route>
             </Routes>

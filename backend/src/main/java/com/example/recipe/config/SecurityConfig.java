@@ -38,7 +38,10 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**", "/api/health").permitAll()
-                .requestMatchers("/api/recipe", "/api/recipe/**").authenticated()
+                // レシピ生成・カロリー計算はログイン不要
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/recipe", "/api/recipe/keywords", "/api/recipe/calories").permitAll()
+                // お気に入り操作はログイン必須
+                .requestMatchers("/api/recipe/favorites", "/api/recipe/favorites/**").authenticated()
                 .requestMatchers("/api/favorites", "/api/favorites/**").authenticated()
                 .anyRequest().permitAll()
             )

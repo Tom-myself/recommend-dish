@@ -19,6 +19,9 @@ export default function FavoritesPage() {
   const [filterMaxTime, setFilterMaxTime] = useState("");
   const [filterMaxCost, setFilterMaxCost] = useState("");
 
+  // ソート用のステート: "" | "cost_asc" | "cost_desc" | "time_asc" | "time_desc"
+  const [sortKey, setSortKey] = useState("");
+
   const fetchFavorites = async () => {
     setLoading(true);
     try {
@@ -27,6 +30,7 @@ export default function FavoritesPage() {
       if (filterIngredient) params.append("ingredient", filterIngredient);
       if (filterMaxTime) params.append("maxTime", filterMaxTime);
       if (filterMaxCost) params.append("maxCost", filterMaxCost);
+      if (sortKey) params.append("sortBy", sortKey);
 
       const url = `${API_BASE_URL}/api/favorites/search?${params.toString()}`;
       const response = await fetch(url, {
@@ -66,14 +70,16 @@ export default function FavoritesPage() {
   };
 
   useEffect(() => {
-    // コンポーネントマウント時（画面読み込み時）にAPIからお気に入りリストを取得する
+    // コンポーネントマウント時やソートキー変更時にAPIからお気に入りリストを取得する
     fetchFavorites();
-  }, []);
+  }, [sortKey]);
 
   // カードがクリックされたとき、詳細画面 (RecipeDetail) へ遷移する関数
   const handleCardClick = (recipe) => {
-    // stateにrecipeオブジェクトを丸ごと渡すことで、RecipeDetail側でその内容を受信・表示できる
-    navigate("/recipe", { state: recipe });
+    // sessionStorageにレシピを保存し、一意なIDでURL遷移
+    const recipeId = crypto.randomUUID();
+    sessionStorage.setItem(`recipe_${recipeId}`, JSON.stringify(recipe));
+    navigate(`/recipe/${recipeId}`);
   };
 
   if (loading) {
@@ -155,10 +161,35 @@ export default function FavoritesPage() {
           </button>
         </div>
         {/* AIアシスタントボタン（検索フォームの右横） */}
-        <div className="pt-1 flex flex-end">
+        <div className="self-center">
           <FavoriteAIAssistant favorites={favorites} />
         </div>
       </div>
+
+      {/* ソートボタン */}
+      {favorites.length > 0 && (
+        <div className="max-w-6xl mx-auto flex flex-wrap items-center gap-2 mb-6">
+          <span className="text-sm font-bold text-[#4A634E] mr-1">並び替え:</span>
+          {[
+            { key: "cost_asc", label: "💰 安い順" },
+            { key: "cost_desc", label: "💰 高い順" },
+            { key: "time_asc", label: "⏱ 短い順" },
+            { key: "time_desc", label: "⏱ 長い順" },
+          ].map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setSortKey(sortKey === key ? "" : key)}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+                sortKey === key
+                  ? "bg-[#166534] text-white"
+                  : "bg-[#FDFDFB] border border-[#E2E8E0] text-[#4A634E] hover:bg-[#E8EDE5]"
+              }`}
+            >
+              {sortKey === key ? "✓ " + label : label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* レシピをグリッド形式（カード一覧）で並べるコンテナ */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">

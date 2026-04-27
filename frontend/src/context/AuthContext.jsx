@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useRef } from 'react';
 
 export const AuthContext = createContext();
 
@@ -17,7 +17,43 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sessionExpired, setSessionExpired] = useState(false);
+  const expiryTimerRef = useRef(null);
 
+  /** セッション切れ処理（ストレージクリア＋状態リセット） */
+  const handleSessionExpired = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    setToken(null);
+    setUser(null);
+    setSessionExpired(true);
+  };
+
+  /** トークンの有効期限に合わせてタイマーを設定 */
+  const scheduleExpiryCheck = (currentToken) => {
+    // 既存のタイマーをクリア
+    if (expiryTimerRef.current) {
+      clearTimeout(expiryTimerRef.current);
+    }
+
+    if (!currentToken) return;
+
+    const expiry = getTokenExpiry(currentToken);
+    if (!expiry) return;
+
+    const remaining = expiry - Date.now();
+    if (remaining <= 0) {
+      // すでに期限切れ
+      handleSessionExpired();
+      return;
+    }
+
+    // 期限ちょうどに発火するタイマーをセット
+    expiryTimerRef.current = setTimeout(() => {
+      handleSessionExpired();
+    }, remaining);
+  };
+
+  // 初回マウント時：ストレージからトークンを復元
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedUsername = localStorage.getItem('username');
@@ -31,26 +67,41 @@ export const AuthProvider = ({ children }) => {
     const expiry = getTokenExpiry(storedToken);
     if (!expiry || Date.now() >= expiry) {
       // 期限切れ → ストレージをクリアしてセッション切れフラグをセット
-      localStorage.removeItem('token');
-      localStorage.removeItem('username');
-      setSessionExpired(true);
+      handleSessionExpired();
     } else {
       // 有効なトークン → ログイン状態を復元
       setToken(storedToken);
       setUser({ username: storedUsername });
+      scheduleExpiryCheck(storedToken);
     }
 
     setLoading(false);
   }, []);
 
-  const login = (token, username) => {
-    localStorage.setItem('token', token);
+  // トークンが変わるたびにタイマーを再設定
+  useEffect(() => {
+    if (token) {
+      scheduleExpiryCheck(token);
+    }
+    return () => {
+      if (expiryTimerRef.current) {
+        clearTimeout(expiryTimerRef.current);
+      }
+    };
+  }, [token]);
+
+  const login = (newToken, username) => {
+    localStorage.setItem('token', newToken);
     localStorage.setItem('username', username);
-    setToken(token);
+    setToken(newToken);
     setUser({ username });
+    setSessionExpired(false);
   };
 
   const logout = () => {
+    if (expiryTimerRef.current) {
+      clearTimeout(expiryTimerRef.current);
+    }
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     setToken(null);

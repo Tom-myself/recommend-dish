@@ -1,8 +1,12 @@
 package com.example.recipe.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import com.example.recipe.ai.GeminiClient;
+import com.example.recipe.dto.FavoriteRecipeDto;
 import com.example.recipe.entity.RecipeRequest;
 import com.example.recipe.entity.RecipeResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -79,5 +83,42 @@ public class RecipeService {
 
         String result = geminiClient.generate(prompt);
         return result.trim();
+    }
+
+    public String chatAboutFavorites(List<FavoriteRecipeDto> recipes, String question) {
+        String recipeList = recipes.stream()
+                .map(r -> String.format(
+                        "- %s（調理時間: %s分, 材料費: %s円, 材料: %s）",
+                        r.getTitle(),
+                        r.getCookingTimeMinutes() != null ? r.getCookingTimeMinutes() : "不明",
+                        r.getEstimatedCostJpy() != null ? r.getEstimatedCostJpy() : "不明",
+                        r.getIngredients() != null ? String.join("・", r.getIngredients()) : "不明"))
+                .collect(Collectors.joining("\n"));
+
+        String prompt = """
+                あなたは料理アシスタントです。ユーザーのお気に入りレシピリストをもとに、質問に日本語で答えてください。
+                回答は親しみやすく、かつ300文字以内でお願いします。
+
+                【判定・並び替えのルール】
+                1. 洗い物が少ない順:
+                   レシピの材料や手順から推測される調理器具（フライパン、鍋、ボウル、レンジ容器等）の使用数を「洗い物スコア」として点数化し、少ない順（スコアが高い順）に紹介してください。
+                2. 朝食向き:
+                   調理時間が15分以内で、かつ栄養バランスが良く朝から食べやすいものを選出してください。
+                3. 献立提案:
+                   主菜と副菜、あるいは味のバリエーションを考慮して組み合わせてください。
+                4. ランダム選出:
+                   指示があればリストからランダムに選んでください。
+
+                必ず以下のお気に入りレシピ一覧にある料理のみを対象に回答してください。
+
+                【お気に入りレシピ一覧】
+                %s
+
+                【ユーザーの質問】
+                %s
+                """.formatted(recipeList, question);
+
+        String answer = geminiClient.generate(prompt);
+        return answer.trim();
     }
 }

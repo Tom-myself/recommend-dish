@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useNavigate, Link, useSearchParams, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { API_BASE_URL } from "../api";
 
@@ -8,8 +8,11 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const isExpired = searchParams.get("expired") === "true";
+  const redirectMessage = location.state?.message;
+  const redirectTo = location.state?.from || "/";
   const { login, setSessionExpired } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
@@ -29,7 +32,7 @@ export default function Login() {
         const data = await response.json();
         setSessionExpired(false);
         login(data.token, data.username);
-        navigate("/");
+        navigate(redirectTo);
       } else {
         setError("ユーザー名またはパスワードが間違っています。");
       }
@@ -53,6 +56,13 @@ export default function Login() {
               <br />
               再度ログインしてください。
             </span>
+          </div>
+        )}
+
+        {redirectMessage && !isExpired && (
+          <div className="bg-[#E8EDE5] border border-[#A3C4A8] text-[#166534] p-4 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
+            <span>❤️</span>
+            <span>{redirectMessage}</span>
           </div>
         )}
 

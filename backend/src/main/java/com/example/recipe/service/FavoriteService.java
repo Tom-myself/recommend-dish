@@ -25,8 +25,8 @@ public class FavoriteService {
     private final RecipeMapper recipeMapper;
 
     public List<FavoriteRecipeDto> searchFavorites(Long userId, String title, String ingredient,
-            Integer maxTime, Integer maxCost) {
-        return favoriteMapper.searchFavorites(userId, title, ingredient, maxTime, maxCost);
+            Integer maxTime, Integer maxCost, String sortBy) {
+        return favoriteMapper.searchFavorites(userId, title, ingredient, maxTime, maxCost, sortBy);
     }
 
     @Transactional

@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { FaHeart } from "react-icons/fa";
 import { CiCalculator1 } from "react-icons/ci";
 import { IoIosTimer } from "react-icons/io";
@@ -10,14 +10,29 @@ import { AuthContext } from "../context/AuthContext";
 import { API_BASE_URL } from "../api";
 
 export default function RecipeDetail() {
+  const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
 
-  const recipe = location.state;
+  // sessionStorageからレシピを取得（location.stateはフォールバック）
+  const storedRecipe = id ? sessionStorage.getItem(`recipe_${id}`) : null;
+  const recipe = storedRecipe ? JSON.parse(storedRecipe) : location.state;
 
   if (!recipe) {
-    return <div>データがありません</div>;
+    return (
+      <div className="min-h-screen bg-[#F4F7F4] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-xl text-[#4A634E] font-bold mb-4">レシピが見つかりませんでした。</p>
+          <button
+            onClick={() => navigate("/")}
+            className="bg-[#166534] text-white font-bold py-3 px-8 rounded-full hover:bg-[#14532D] transition-all"
+          >
+            ホームへ戻る
+          </button>
+        </div>
+      </div>
+    );
   }
 
   // idが存在する（＝お気に入り一覧から来た、またはDBに保存済みのデータ）場合は初期状態をtrueにする
@@ -25,6 +40,12 @@ export default function RecipeDetail() {
   const [calories, setCalories] = useState(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const handleLike = async () => {
+    // 未ログインの場合はログインページへ誘導（現在のURLを保持）
+    if (!token) {
+      navigate("/login", { state: { from: location.pathname, message: "ハート機能を使うにはログインが必要です" } });
+      return;
+    }
+
     const newLiked = !liked;
     setLiked(newLiked); // 先にUI更新（UX良い）
 

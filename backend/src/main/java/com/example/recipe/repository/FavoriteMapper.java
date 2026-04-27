@@ -50,6 +50,14 @@ public interface FavoriteMapper {
                         AND r.estimated_cost_jpy &lt;= #{maxCost}
                     </if>
                 </where>
+                ORDER BY
+                <choose>
+                    <when test="sortBy == 'cost_asc'">r.estimated_cost_jpy ASC</when>
+                    <when test="sortBy == 'cost_desc'">r.estimated_cost_jpy DESC</when>
+                    <when test="sortBy == 'time_asc'">r.cooking_time_minutes ASC</when>
+                    <when test="sortBy == 'time_desc'">r.cooking_time_minutes DESC</when>
+                    <otherwise>f.id DESC</otherwise>
+                </choose>
                 </script>
             """)
     @Results({
@@ -66,5 +74,6 @@ public interface FavoriteMapper {
             @Param("title") String title,
             @Param("ingredient") String ingredient,
             @Param("maxTime") Integer maxTime,
-            @Param("maxCost") Integer maxCost);
+            @Param("maxCost") Integer maxCost,
+            @Param("sortBy") String sortBy);
 }
