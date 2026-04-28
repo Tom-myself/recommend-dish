@@ -3,9 +3,9 @@ version: "3.8"
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: habit-tracker-db
+    container_name: recommend-recipe-db
     environment:
-      POSTGRES_DB: habit_tracker_db
+      POSTGRES_DB: recommend_recipe_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -22,12 +22,12 @@ services:
   backend:
     build:
       context: ./backend
-    container_name: habit-tracker-app
+    container_name: recommend-recipe-app
     depends_on:
       postgres:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/habit_tracker_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/recommend_recipe_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       GOOGLE_API_KEY: ${GOOGLE_API_KEY}

@@ -22,7 +22,18 @@ export default function Home() {
 
     try {
       const endpoint =
-        mode === "ingredients" ? "/api/recipe" : "/api/recipe/keywords";
+        mode === "ingredients" ? "/api/recipe" : "/api/recipe/keyword";
+
+      const requestBody =
+        mode === "ingredients"
+          ? {
+              ingredients: typeof query === "string" ? query.split(",") : query,
+              utensils: utensils,
+            }
+          : {
+              keyword: query,
+              utensils: utensils,
+            };
 
       const res = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
@@ -30,10 +41,7 @@ export default function Home() {
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({
-          ingredients: typeof query === "string" ? query.split(",") : query,
-          utensils: utensils,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!res.ok) {
@@ -111,6 +119,7 @@ export default function Home() {
           <input
             disabled={loading}
             type="text"
+            value={query}
             placeholder={
               mode === "ingredients"
                 ? "例：鶏もも肉、白菜、きのこ"

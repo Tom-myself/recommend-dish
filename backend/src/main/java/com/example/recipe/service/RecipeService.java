@@ -72,6 +72,51 @@ public class RecipeService {
 
     }
 
+    public RecipeResponse generateRecipeByKeyword(String keyword, String utensils) {
+
+        String utensilsCondition = (utensils != null && !utensils.isBlank())
+                ? "調理器具の条件: " + utensils
+                : "調理器具の条件: 特に指定なし";
+
+        String prompt = """
+                あなたはプロの料理研究家です。レシピを提案してください。
+
+                以下のキーワードに合うレシピを作ってください:
+                %s
+
+                %s
+                ※例：「フライパンのみ」「フライパンなし（レンジ等で調理）」などの指定がある場合は、必ずその条件に従ってレシピを構成してください。
+
+                必ずJSON形式で出力してください。説明文は禁止。
+                料理は一品まででお願いします。
+                料理名(title)は、変な改行を防ぐため【必ず20文字以内】で簡潔にしてください。
+                想定調理時間（分）と、想定材料費（日本円）も数値で出力してください。
+
+                {
+                  "title": "料理名",
+                  "ingredients": ["材料1", "材料2"],
+                  "steps": ["手順1", "手順2"],
+                  "points": ["ポイント1", "ポイント2"],
+                  "cookingTimeMinutes": 15,
+                  "estimatedCostJpy": 300
+                }
+                """.formatted(keyword, utensilsCondition);
+
+        String json = geminiClient.generate(prompt);
+        json = json
+                .replace("```json", "")
+                .replace("```", "")
+                .trim();
+
+        System.out.println("🔥 raw json (keyword): " + json);
+
+        try {
+            return objectMapper.readValue(json, RecipeResponse.class);
+        } catch (Exception e) {
+            throw new RuntimeException("JSONパース失敗: " + json, e);
+        }
+    }
+
     public String calculateCalories(RecipeResponse recipe) {
         String prompt = """
                 あなたはプロの栄養士です。以下のレシピの合計カロリーの目安を推測してください。

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.example.recipe.entity.KeywordRequest;
 import com.example.recipe.entity.RecipeRequest;
 import com.example.recipe.entity.RecipeResponse;
 import com.example.recipe.service.RecipeService;
@@ -32,6 +33,11 @@ public class RecipeController {
         RecipeResponse result = recipeService.generateRecipe(request);
 
         return result;
+    }
+
+    @PostMapping("/keyword")
+    public RecipeResponse generateByKeyword(@RequestBody KeywordRequest request) {
+        return recipeService.generateRecipeByKeyword(request.getKeyword(), request.getUtensils());
     }
 
     @PostMapping("/favorites")
