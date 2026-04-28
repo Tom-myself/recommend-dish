@@ -43,6 +43,16 @@ export default function ServerStatusBanner() {
     }
   };
 
+  const [showDelay, setShowDelay] = useState(false);
+
+  useEffect(() => {
+    // サーバーが起きている時のチラつきを防ぐため、800ms経過してからバナーを表示する
+    const timer = setTimeout(() => {
+      setShowDelay(true);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     checkServer();
     checkIntervalRef.current = setInterval(checkServer, 5000);
@@ -56,8 +66,10 @@ export default function ServerStatusBanner() {
     };
   }, []);
 
-  // サーバー起動済み or まだ確認中（初回チェック前）は表示しない
-  if (serverReady === true || serverReady === null) return null;
+  // サーバー起動済みの場合は表示しない
+  if (serverReady === true) return null;
+  // 初回チェック中で、かつ800ms経過していない場合は表示しない
+  if (serverReady === null && !showDelay) return null;
 
   const { icon, text } = MESSAGES[msgIndex];
 

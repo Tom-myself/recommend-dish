@@ -23,7 +23,9 @@ export default function RecipeDetail() {
     return (
       <div className="min-h-screen bg-[#F4F7F4] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-[#4A634E] font-bold mb-4">レシピが見つかりませんでした。</p>
+          <p className="text-xl text-[#4A634E] font-bold mb-4">
+            レシピが見つかりませんでした。
+          </p>
           <button
             onClick={() => navigate("/")}
             className="bg-[#166534] text-white font-bold py-3 px-8 rounded-full hover:bg-[#14532D] transition-all"
@@ -42,7 +44,12 @@ export default function RecipeDetail() {
   const handleLike = async () => {
     // 未ログインの場合はログインページへ誘導（現在のURLを保持）
     if (!token) {
-      navigate("/login", { state: { from: location.pathname, message: "ハート機能を使うにはログインが必要です" } });
+      navigate("/login", {
+        state: {
+          from: location.pathname,
+          message: "ハート機能を使うにはログインが必要です",
+        },
+      });
       return;
     }
 
@@ -101,24 +108,25 @@ export default function RecipeDetail() {
       </button>
 
       <div className="max-w-5xl mx-auto bg-[#FDFDFB] rounded-[2rem] shadow-sm border border-[#E2E8E0] p-8 md:p-12">
-        <div className="flex justify-end mb-6">
-          <button
-            onClick={handleLike}
-            className={`text-3xl transition-all flex items-center justify-center p-3 rounded-full hover:bg-[#FCE8E8] shrink-0 ${
-              liked ? "text-red-500 scale-110" : "text-[#A3B8A6]"
-            }`}
-          >
-            <FaHeart />
-          </button>
-        </div>
 
         {/* トップの2カラム（クックパッド風：画像の代わりに情報＋材料表示） */}
         <div className="flex flex-col md:flex-row gap-10 mb-12">
           {/* 左側：タイトルと主要メタデータ */}
           <div className="md:w-7/12 flex flex-col justify-start">
-            <h1 className="text-3xl md:text-4xl font-black text-[#1F291E] tracking-tight leading-tight mb-6 border-b border-[#E2E8E0] pb-6">
-              {recipe.title}
-            </h1>
+            <div className="mb-6 border-b border-[#E2E8E0] pb-4">
+              <h1 className="text-2xl md:text-4xl font-black text-[#1F291E] tracking-tight leading-tight mb-3">
+                {recipe.title}
+              </h1>
+              <button
+                onClick={handleLike}
+                className={`text-3xl transition-all flex items-center justify-center p-2 -ml-2 rounded-full hover:bg-[#FCE8E8] w-fit shrink-0 ${
+                  liked ? "text-red-500 scale-110" : "text-[#A3B8A6]"
+                }`}
+                title={liked ? "お気に入りから外す" : "お気に入りに登録"}
+              >
+                <FaHeart />
+              </button>
+            </div>
 
             {/* サムネイル画像プレースホルダー */}
             <div className="w-full aspect-video bg-[#E8EDE5] rounded-2xl flex items-center justify-center text-6xl text-[#A3B8A6] mb-6 shadow-sm border border-[#CFD8CD]">
