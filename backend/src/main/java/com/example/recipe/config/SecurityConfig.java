@@ -43,6 +43,7 @@ public class SecurityConfig {
                 // お気に入り操作はログイン必須
                 .requestMatchers("/api/recipe/favorites", "/api/recipe/favorites/**").authenticated()
                 .requestMatchers("/api/favorites", "/api/favorites/**").authenticated()
+                .requestMatchers("/api/cooking-logs", "/api/cooking-logs/**").authenticated()
                 .anyRequest().permitAll()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

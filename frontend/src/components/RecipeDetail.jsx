@@ -1,5 +1,6 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { FaHeart } from "react-icons/fa";
+import { GiCookingPot } from "react-icons/gi";
 import { CiCalculator1 } from "react-icons/ci";
 import { IoIosTimer } from "react-icons/io";
 import { MdOutlineTipsAndUpdates } from "react-icons/md";
@@ -39,6 +40,7 @@ export default function RecipeDetail() {
 
   // idが存在する（＝お気に入り一覧から来た、またはDBに保存済みのデータ）場合は初期状態をtrueにする
   const [liked, setLiked] = useState(!!recipe.id);
+  const [cooked, setCooked] = useState(false);
   const [calories, setCalories] = useState(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const handleLike = async () => {
@@ -68,6 +70,35 @@ export default function RecipeDetail() {
     } catch (err) {
       console.error(err);
       setLiked(!newLiked); // 失敗したら戻す
+    }
+  };
+
+  const handleCooked = async () => {
+    if (!token) {
+      navigate("/login", {
+        state: {
+          from: location.pathname,
+          message: "料理ログを記録するにはログインが必要です",
+        },
+      });
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/cooking-logs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ recipeId: recipe.id }),
+      });
+      if (res.ok) {
+        setCooked(true);
+        setTimeout(() => setCooked(false), 3000);
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -117,15 +148,31 @@ export default function RecipeDetail() {
               <h1 className="text-2xl md:text-4xl font-black text-[#1F291E] tracking-tight leading-tight mb-3">
                 {recipe.title}
               </h1>
-              <button
-                onClick={handleLike}
-                className={`text-3xl transition-all flex items-center justify-center p-2 -ml-2 rounded-full hover:bg-[#FCE8E8] w-fit shrink-0 ${
-                  liked ? "text-red-500 scale-110" : "text-[#A3B8A6]"
-                }`}
-                title={liked ? "お気に入りから外す" : "お気に入りに登録"}
-              >
-                <FaHeart />
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleLike}
+                  className={`text-3xl transition-all flex items-center justify-center p-2 rounded-full hover:bg-[#FCE8E8] w-fit shrink-0 ${
+                    liked ? "text-red-500 scale-110" : "text-[#A3B8A6]"
+                  }`}
+                  title={liked ? "お気に入りから外す" : "お気に入りに登録"}
+                >
+                  <FaHeart />
+                </button>
+                {recipe.id && (
+                  <button
+                    onClick={handleCooked}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm transition-all ${
+                      cooked
+                        ? "bg-[#166534] text-white scale-105"
+                        : "bg-[#E8EDE5] text-[#2B3229] hover:bg-[#D1E0CA]"
+                    }`}
+                    title="料理ログに記録する"
+                  >
+                    <GiCookingPot className="text-lg" />
+                    {cooked ? "✓ 記録しました！" : "作った！"}
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* サムネイル画像プレースホルダー */}

@@ -36,6 +36,12 @@ export default function Header() {
                 >
                   お気に入り
                 </Link>
+                <Link
+                  to="/calendar"
+                  className="text-[#4A634E] font-medium hover:bg-[#E8EDE5] px-4 py-2 rounded-full transition-colors"
+                >
+                  📅 カレンダー
+                </Link>
                 <div className="flex items-center gap-3 pl-4 border-l border-[#CFD8CD]">
                   <span className="text-sm text-[#4A634E]">
                     <span className="font-bold text-[#1F291E]">

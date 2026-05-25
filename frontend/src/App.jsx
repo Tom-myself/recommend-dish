@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import Home from "./pages/Home";
 import FavoritesPage from "./pages/FavoritesPage";
+import CalendarPage from "./pages/CalendarPage";
 import "./App.css";
 import RecipeDetail from "./components/RecipeDetail";
 import Login from "./pages/Login";
@@ -41,6 +42,7 @@ function App() {
               {/* ログインが必要なページ */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/favorites" element={<FavoritesPage />} />
+                <Route path="/calendar" element={<CalendarPage />} />
               </Route>
             </Routes>
           </main>
