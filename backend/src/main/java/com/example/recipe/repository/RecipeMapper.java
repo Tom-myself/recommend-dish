@@ -27,12 +27,12 @@ public interface RecipeMapper {
     @Select("SELECT description FROM recipe_points WHERE recipe_id = #{recipeId} ORDER BY sort_order")
     List<String> findPointDescriptionsByRecipeId(@Param("recipeId") Long recipeId);
 
-    @Insert("""
+    @Select("""
         INSERT INTO recipes (title, cooking_time_minutes, estimated_cost_jpy)
         VALUES (#{title}, #{cookingTimeMinutes}, #{estimatedCostJpy})
+        RETURNING id
     """)
-    @Options(useGeneratedKeys = true, keyProperty = "id")
-    void insert(Recipe recipe);
+    Long insert(Recipe recipe);
 
     @Insert("""
         <script>

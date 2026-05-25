@@ -14,6 +14,7 @@ import com.example.recipe.entity.RecipeStep;
 import com.example.recipe.repository.FavoriteMapper;
 import com.example.recipe.repository.RecipeMapper;
 import com.example.recipe.dto.FavoriteRecipeDto;
+import com.example.recipe.entity.FavoriteRecipeSummary;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,47 +25,71 @@ public class FavoriteService {
     private final FavoriteMapper favoriteMapper;
     private final RecipeMapper recipeMapper;
 
+    /**
+     * お気に入り検索。
+     * Mapper は FavoriteRecipeSummary（基本情報のみ）を返し、Service で完全な DTO に組み立てる。
+     */
     public List<FavoriteRecipeDto> searchFavorites(Long userId, String title, String ingredient,
             Integer maxTime, Integer maxCost, String sortBy) {
-        return favoriteMapper.searchFavorites(userId, title, ingredient, maxTime, maxCost, sortBy);
+        // 1. Mapper から基本情報（4カラム）を取得
+        List<FavoriteRecipeSummary> summaries = favoriteMapper.searchFavorites(userId, title, ingredient, maxTime, maxCost, sortBy);
+
+        // 2. 各レシピに材料・手順・ポイントを紐づけて不変な DTO に変換
+        return summaries.stream()
+                .map(s -> new FavoriteRecipeDto(
+                        s.id(),
+                        s.title(),
+                        s.cookingTimeMinutes(),
+                        s.estimatedCostJpy(),
+                        recipeMapper.findIngredientNamesByRecipeId(s.id()),
+                        recipeMapper.findStepDescriptionsByRecipeId(s.id()),
+                        recipeMapper.findPointDescriptionsByRecipeId(s.id())))
+                .toList();
     }
 
     @Transactional
     public void toggleFavorite(Long userId, RecipeResponse recipeResponse, boolean isLike) {
         // Find existing recipe
-        Recipe recipe = recipeMapper.findByTitle(recipeResponse.getTitle());
+        Recipe recipe = recipeMapper.findByTitle(recipeResponse.title());
 
         if (recipe == null && isLike) {
             // Unexisting recipe, save it first
-            recipe = new Recipe();
-            recipe.setTitle(recipeResponse.getTitle());
-            recipe.setCookingTimeMinutes(recipeResponse.getCookingTimeMinutes());
-            recipe.setEstimatedCostJpy(recipeResponse.getEstimatedCostJpy());
-            recipeMapper.insert(recipe);
+            recipe = new Recipe(
+                null,
+                recipeResponse.title(),
+                null,
+                null,
+                null,
+                recipeResponse.cookingTimeMinutes(),
+                recipeResponse.estimatedCostJpy()
+            );
+            
+            Long newId = recipeMapper.insert(recipe);
+            recipe = recipe.withId(newId);
 
-            if (recipeResponse.getIngredients() != null && !recipeResponse.getIngredients().isEmpty()) {
+            if (recipeResponse.ingredients() != null && !recipeResponse.ingredients().isEmpty()) {
                 List<RecipeIngredient> ingredients = new ArrayList<>();
                 int order = 0;
-                for (String ing : recipeResponse.getIngredients()) {
-                    ingredients.add(new RecipeIngredient(null, recipe.getId(), ing, order++));
+                for (String ing : recipeResponse.ingredients()) {
+                    ingredients.add(new RecipeIngredient(null, recipe.id(), ing, order++));
                 }
                 recipeMapper.insertIngredients(ingredients);
             }
 
-            if (recipeResponse.getSteps() != null && !recipeResponse.getSteps().isEmpty()) {
+            if (recipeResponse.steps() != null && !recipeResponse.steps().isEmpty()) {
                 List<RecipeStep> steps = new ArrayList<>();
                 int order = 1;
-                for (String step : recipeResponse.getSteps()) {
-                    steps.add(new RecipeStep(null, recipe.getId(), step, order++));
+                for (String step : recipeResponse.steps()) {
+                    steps.add(new RecipeStep(null, recipe.id(), step, order++));
                 }
                 recipeMapper.insertSteps(steps);
             }
 
-            if (recipeResponse.getPoints() != null && !recipeResponse.getPoints().isEmpty()) {
+            if (recipeResponse.points() != null && !recipeResponse.points().isEmpty()) {
                 List<RecipePoint> points = new ArrayList<>();
                 int order = 0;
-                for (String point : recipeResponse.getPoints()) {
-                    points.add(new RecipePoint(null, recipe.getId(), point, order++));
+                for (String point : recipeResponse.points()) {
+                    points.add(new RecipePoint(null, recipe.id(), point, order++));
                 }
                 recipeMapper.insertPoints(points);
             }
@@ -75,13 +100,13 @@ public class FavoriteService {
                 // save to favorites. Need to check if already exists to prevent duplicate key
                 // but for now we ignore or handle gracefully
                 try {
-                    favoriteMapper.insert(userId, recipe.getId());
+                    favoriteMapper.insert(userId, recipe.id());
                 } catch (Exception e) {
                     // Ignore duplicate
                 }
             } else {
                 // delete from favorites
-                favoriteMapper.delete(userId, recipe.getId());
+                favoriteMapper.delete(userId, recipe.id());
             }
         }
     }

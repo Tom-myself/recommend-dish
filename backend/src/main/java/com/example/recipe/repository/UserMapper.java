@@ -16,7 +16,6 @@ public interface UserMapper {
     @Select("SELECT id, username, email, password_hash AS passwordHash, created_at AS createdAt FROM users WHERE email = #{email}")
     User findByEmail(@Param("email") String email);
 
-    @Insert("INSERT INTO users (username, email, password_hash) VALUES (#{username}, #{email}, #{passwordHash})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
-    void insert(User user);
+    @Select("INSERT INTO users (username, email, password_hash) VALUES (#{username}, #{email}, #{passwordHash}) RETURNING id")
+    Long insert(User user);
 }

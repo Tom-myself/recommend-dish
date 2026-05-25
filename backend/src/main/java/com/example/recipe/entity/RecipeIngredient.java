@@ -4,12 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RecipeIngredient {
-    private Long id;
-    private Long recipeId;
-    private String name;
-    private Integer sortOrder;
-}
+public record RecipeIngredient(
+    Long id,
+    Long recipeId,
+    String name,
+    Integer sortOrder
+) {}

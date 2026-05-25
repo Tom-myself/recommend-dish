@@ -9,6 +9,7 @@ import com.example.recipe.ai.GeminiClient;
 import com.example.recipe.dto.FavoriteRecipeDto;
 import com.example.recipe.entity.RecipeRequest;
 import com.example.recipe.entity.RecipeResponse;
+import com.example.recipe.entity.WashingUpScore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -22,9 +23,9 @@ public class RecipeService {
 
     public RecipeResponse generateRecipe(RecipeRequest request) {
 
-        String ingredientsStr = request.getIngredients() != null ? request.getIngredients().toString() : "";
-        String utensilsCondition = (request.getUtensils() != null && !request.getUtensils().isBlank())
-                ? "調理器具の条件: " + request.getUtensils()
+        String ingredientsStr = request.ingredients() != null ? request.ingredients().toString() : "";
+        String utensilsCondition = (request.utensils() != null && !request.utensils().isBlank())
+                ? "調理器具の条件: " + request.utensils()
                 : "調理器具の条件: 特に指定なし";
 
         String prompt = """
@@ -124,7 +125,7 @@ public class RecipeService {
 
                 料理名: %s
                 材料: %s
-                """.formatted(recipe.getTitle(), recipe.getIngredients().toString());
+                """.formatted(recipe.title(), recipe.ingredients().toString());
 
         String result = geminiClient.generate(prompt);
         return result.trim();
@@ -132,12 +133,16 @@ public class RecipeService {
 
     public String chatAboutFavorites(List<FavoriteRecipeDto> recipes, String question) {
         String recipeList = recipes.stream()
-                .map(r -> String.format(
-                        "- %s（調理時間: %s分, 材料費: %s円, 材料: %s）",
-                        r.getTitle(),
-                        r.getCookingTimeMinutes() != null ? r.getCookingTimeMinutes() : "不明",
-                        r.getEstimatedCostJpy() != null ? r.getEstimatedCostJpy() : "不明",
-                        r.getIngredients() != null ? String.join("・", r.getIngredients()) : "不明"))
+                .map(r -> {
+                    WashingUpScore score = WashingUpScore.calculateFromStepsAndIngredients(r.steps(), r.ingredients());
+                    return String.format(
+                            "- %s（調理時間: %s分, 材料費: %s円, 材料: %s, 洗い物スコア: %d）",
+                            r.title(),
+                            r.cookingTimeMinutes() != null ? r.cookingTimeMinutes() : "不明",
+                            r.estimatedCostJpy() != null ? r.estimatedCostJpy() : "不明",
+                            r.ingredients() != null ? String.join("・", r.ingredients()) : "不明",
+                            score.getValue());
+                })
                 .collect(Collectors.joining("\n"));
 
         String prompt = """

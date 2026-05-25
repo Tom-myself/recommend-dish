@@ -30,26 +30,30 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already exists");
         }
 
-        User user = new User();
-        user.setUsername(request.username());
-        user.setEmail(request.email());
-        user.setPasswordHash(passwordEncoder.encode(request.password()));
+        User user = new User(
+            null,
+            request.username(),
+            request.email(),
+            passwordEncoder.encode(request.password()),
+            null
+        );
 
-        userMapper.insert(user);
+        Long newId = userMapper.insert(user);
+        user = new User(newId, user.username(), user.email(), user.passwordHash(), user.createdAt());
 
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
-        return ResponseEntity.ok(new AuthResponse(token, user.getUsername(), user.getId()));
+        String token = jwtUtil.generateToken(user.id(), user.username());
+        return ResponseEntity.ok(new AuthResponse(token, user.username(), user.id()));
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         User user = userMapper.findByUsername(request.username());
 
-        if (user == null || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+        if (user == null || !passwordEncoder.matches(request.password(), user.passwordHash())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
 
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
-        return ResponseEntity.ok(new AuthResponse(token, user.getUsername(), user.getId()));
+        String token = jwtUtil.generateToken(user.id(), user.username());
+        return ResponseEntity.ok(new AuthResponse(token, user.username(), user.id()));
     }
 }

@@ -6,15 +6,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RecipeResponse {
-
-    private String title;
-    private List<String> ingredients;
-    private List<String> steps;
-    private List<String> points;
-    private Integer cookingTimeMinutes;
-    private Integer estimatedCostJpy;
+public record RecipeResponse(
+    String title,
+    List<String> ingredients,
+    List<String> steps,
+    List<String> points,
+    Integer cookingTimeMinutes,
+    Integer estimatedCostJpy
+) {
+    public RecipeResponse {
+        ingredients = ingredients == null ? List.of() : List.copyOf(ingredients);
+        steps = steps == null ? List.of() : List.copyOf(steps);
+        points = points == null ? List.of() : List.copyOf(points);
+    }
 }

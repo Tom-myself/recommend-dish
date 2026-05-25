@@ -5,10 +5,9 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Many;
 import java.util.List;
+
+import com.example.recipe.entity.FavoriteRecipeSummary;
 
 @Mapper
 public interface FavoriteMapper {
@@ -27,7 +26,7 @@ public interface FavoriteMapper {
             """)
     void delete(@Param("userId") Long userId, @Param("recipeId") Long recipeId);
 
-    // 検索は Recipe テーブルと JOIN して情報を引っ張る
+    // Mapper は軽量DTO（4カラム分）だけを返す。完全な DTO への変換は Service の責務。
     @Select("""
                 <script>
                 SELECT r.id, r.title, r.cooking_time_minutes, r.estimated_cost_jpy FROM recipes r
@@ -60,16 +59,7 @@ public interface FavoriteMapper {
                 </choose>
                 </script>
             """)
-    @Results({
-            @Result(property = "id", column = "id"),
-            @Result(property = "title", column = "title"),
-            @Result(property = "cookingTimeMinutes", column = "cooking_time_minutes"),
-            @Result(property = "estimatedCostJpy", column = "estimated_cost_jpy"),
-            @Result(property = "ingredients", column = "id", many = @Many(select = "com.example.recipe.repository.RecipeMapper.findIngredientNamesByRecipeId")),
-            @Result(property = "steps", column = "id", many = @Many(select = "com.example.recipe.repository.RecipeMapper.findStepDescriptionsByRecipeId")),
-            @Result(property = "points", column = "id", many = @Many(select = "com.example.recipe.repository.RecipeMapper.findPointDescriptionsByRecipeId"))
-    })
-    List<com.example.recipe.dto.FavoriteRecipeDto> searchFavorites(
+    List<FavoriteRecipeSummary> searchFavorites(
             @Param("userId") Long userId,
             @Param("title") String title,
             @Param("ingredient") String ingredient,

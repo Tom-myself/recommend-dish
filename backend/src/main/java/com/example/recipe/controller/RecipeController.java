@@ -37,7 +37,7 @@ public class RecipeController {
 
     @PostMapping("/keyword")
     public RecipeResponse generateByKeyword(@RequestBody KeywordRequest request) {
-        return recipeService.generateRecipeByKeyword(request.getKeyword(), request.getUtensils());
+        return recipeService.generateRecipeByKeyword(request.keyword(), request.utensils());
     }
 
     @PostMapping("/favorites")
@@ -45,7 +45,7 @@ public class RecipeController {
         Long userId = (Long) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
         favoriteService.toggleFavorite(userId, recipe, true);
-        System.out.println("お気に入り登録: " + recipe.getTitle());
+        System.out.println("お気に入り登録: " + recipe.title());
         return ResponseEntity.ok("お気に入りに登録しました");
     }
 
@@ -54,7 +54,7 @@ public class RecipeController {
         Long userId = (Long) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
         favoriteService.toggleFavorite(userId, recipe, false);
-        System.out.println("お気に入り解除: " + recipe.getTitle());
+        System.out.println("お気に入り解除: " + recipe.title());
         return ResponseEntity.ok("お気に入りを解除しました");
     }
 

@@ -6,11 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RecipeRequest {
-
-    private List<String> ingredients;
-    private String utensils;
+public record RecipeRequest(
+    List<String> ingredients,
+    String utensils
+) {
+    public RecipeRequest {
+        ingredients = ingredients == null ? List.of() : List.copyOf(ingredients);
+    }
 }

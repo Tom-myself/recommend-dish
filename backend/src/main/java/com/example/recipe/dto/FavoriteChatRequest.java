@@ -3,8 +3,11 @@ package com.example.recipe.dto;
 import java.util.List;
 import lombok.Data;
 
-@Data
-public class FavoriteChatRequest {
-    private String question;
-    private List<FavoriteRecipeDto> recipes;
+public record FavoriteChatRequest(
+    String question,
+    List<FavoriteRecipeDto> recipes
+) {
+    public FavoriteChatRequest {
+        recipes = recipes == null ? List.of() : List.copyOf(recipes);
+    }
 }

@@ -44,7 +44,7 @@ public class FavoriteController {
 
     @PostMapping("/chat")
     public ResponseEntity<String> chat(@RequestBody FavoriteChatRequest request) {
-        String answer = recipeService.chatAboutFavorites(request.getRecipes(), request.getQuestion());
+        String answer = recipeService.chatAboutFavorites(request.recipes(), request.question());
         return ResponseEntity.ok(answer);
     }
 }
