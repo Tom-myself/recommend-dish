@@ -50,4 +50,12 @@ CREATE TABLE IF NOT EXISTS favorites (
     CONSTRAINT unique_user_recipe UNIQUE (user_id, recipe_id)
 );
 
-
+CREATE TABLE IF NOT EXISTS cooking_logs (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    recipe_id BIGINT NOT NULL,
+    cooked_at DATE NOT NULL DEFAULT CURRENT_DATE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_cooking_log_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_cooking_log_recipe FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
+);
