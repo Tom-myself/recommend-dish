@@ -20,6 +20,8 @@ target/
 *.iml
 *.ipr
 
+./kadai.md
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
