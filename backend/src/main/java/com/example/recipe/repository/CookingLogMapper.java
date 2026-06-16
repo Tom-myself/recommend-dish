@@ -2,6 +2,7 @@ package com.example.recipe.repository;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -44,4 +45,10 @@ public interface CookingLogMapper {
     Integer sumCostByUserIdAndMonth(@Param("userId") Long userId,
             @Param("year") int year,
             @Param("month") int month);
+
+    @Delete("""
+                DELETE FROM cooking_logs
+                WHERE id = #{logId} AND user_id = #{userId}
+            """)
+    int deleteByIdAndUserId(@Param("logId") Long logId, @Param("userId") Long userId);
 }

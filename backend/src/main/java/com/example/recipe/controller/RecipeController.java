@@ -14,6 +14,7 @@ import com.example.recipe.entity.RecipeResponse;
 import com.example.recipe.service.RecipeService;
 import com.example.recipe.service.FavoriteService;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/api/recipe")

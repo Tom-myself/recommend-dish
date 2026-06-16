@@ -39,4 +39,14 @@ public class CookingLogController {
         MonthlyCostSummary summary = logService.getMonthlySummary(userId, year, month);
         return ResponseEntity.ok(summary);
     }
+
+    // 料理ログの削除
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteCookingLog(@PathVariable Long id) {
+        Long userId = (Long) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        logService.deleteCookingLog(userId, id);
+        return ResponseEntity.ok("削除しました");
+    }
 }

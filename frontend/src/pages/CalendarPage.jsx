@@ -12,6 +12,8 @@ export default function CalendarPage() {
   const [month, setMonth] = useState(today.getMonth() + 1);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchSummary = async () => {
     setLoading(true);
@@ -20,7 +22,7 @@ export default function CalendarPage() {
         `${API_BASE_URL}/api/cooking-logs?year=${year}&month=${month}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       if (res.ok) {
         const data = await res.json();
@@ -71,6 +73,28 @@ export default function CalendarPage() {
     return days;
   };
 
+  const deleteCookingLog = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/api/cooking-logs/${deleteTarget.logId}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      if (res.ok) {
+        setDeleteTarget(null);
+        await fetchSummary();
+      }
+    } catch (err) {
+      console.error("削除エラー:", err);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   // 特定の日のログを取得する関数
   const getLogsForDay = (day) => {
     if (!summary || !summary.logs) return [];
@@ -115,7 +139,9 @@ export default function CalendarPage() {
       {/* サマリーカード */}
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <div className="bg-[#FDFDFB] rounded-2xl border border-[#E2E8E0] p-6 text-center">
-          <p className="text-sm font-bold text-[#4A634E] mb-1">今月の合計食費</p>
+          <p className="text-sm font-bold text-[#4A634E] mb-1">
+            今月の合計食費
+          </p>
           <p className="text-3xl font-black text-[#166534]">
             {summary?.totalCostJpy != null
               ? `¥${summary.totalCostJpy.toLocaleString()}`
@@ -211,8 +237,14 @@ export default function CalendarPage() {
                 </span>
                 {logs.map((log, j) => (
                   <div
+                    onClick={() =>
+                      setDeleteTarget({
+                        logId: log.id,
+                        title: log.recipeTitle,
+                      })
+                    }
                     key={j}
-                    className="text-[10px] sm:text-xs bg-[#166534] text-white rounded-md px-1.5 py-0.5 mb-0.5 truncate font-medium"
+                    className="text-[10px] sm:text-xs bg-[#166534] text-white cursor-pointer hover:bg-red-600 transition-colors rounded-md px-1.5 py-0.5 mb-0.5 truncate font-medium"
                     title={`${log.recipeTitle}${log.estimatedCostJpy ? ` (${log.estimatedCostJpy}円)` : ""}`}
                   >
                     🍳 {log.recipeTitle}
@@ -223,6 +255,41 @@ export default function CalendarPage() {
           })}
         </div>
       </div>
+
+      {/* 削除確認モーダル */}
+      {deleteTarget && (
+        <div
+          className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4"
+          onClick={() => setDeleteTarget(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 max-w-sm w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-bold text-[#1F291E] mb-2 text-center">
+              🗑️ 記録を削除
+            </h3>
+            <p className="text-sm text-[#4A634E] text-center mb-6">
+              「<span className="font-bold text-[#166534]">{deleteTarget.title}</span>」の記録を削除しますか？
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="flex-1 py-2.5 rounded-xl border border-[#E2E8E0] text-[#4A634E] font-bold hover:bg-[#F4F7F4] transition-colors"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={deleteCookingLog}
+                disabled={deleting}
+                className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-colors disabled:opacity-50"
+              >
+                {deleting ? "削除中..." : "削除"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

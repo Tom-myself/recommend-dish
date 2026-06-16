@@ -24,6 +24,12 @@ public class CookingLogService {
         Integer totalCost = cookingLogMapper.sumCostByUserIdAndMonth(userId, year, month);
 
         return new MonthlyCostSummary(year, month, totalCost, logs.size(), logs);
+    }
 
+    public void deleteCookingLog(Long userId, Long logId) {
+        int deleted = cookingLogMapper.deleteByIdAndUserId(logId, userId);
+        if (deleted == 0) {
+            throw new RuntimeException("削除対象の記録が見つかりません");
+        }
     }
 }
