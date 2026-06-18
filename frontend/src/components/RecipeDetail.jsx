@@ -139,7 +139,6 @@ export default function RecipeDetail() {
       </button>
 
       <div className="max-w-5xl mx-auto bg-[#FDFDFB] rounded-[2rem] shadow-sm border border-[#E2E8E0] p-8 md:p-12">
-
         {/* トップの2カラム（クックパッド風：画像の代わりに情報＋材料表示） */}
         <div className="flex flex-col md:flex-row gap-10 mb-12">
           {/* 左側：タイトルと主要メタデータ */}
@@ -198,6 +197,27 @@ export default function RecipeDetail() {
                   <span>{recipe.estimatedCostJpy} 円</span>
                 </div>
               )}
+              {recipe.washingUpScore != null && (
+                <div
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm ${
+                    recipe.washingUpScore >= 7
+                      ? "bg-[#D1E0CA] text-[#14532D]" // スコアが高い（楽）＝緑色
+                      : recipe.washingUpScore >= 4
+                        ? "bg-[#E8EDE5] text-[#2B3229]" // 普通＝通常色
+                        : "bg-[#FCE8E8] text-[#991B1B]" // 低い（大変）＝赤色
+                  }`}
+                  title={`洗い物スコア: ${recipe.washingUpScore} / 10`}
+                >
+                  <span className="text-xl">🧽</span>
+                  <span>
+                    {recipe.washingUpScore >= 7
+                      ? "洗い物ラクラク"
+                      : recipe.washingUpScore >= 4
+                        ? "洗い物ふつう"
+                        : "洗い物多め"}
+                  </span>
+                </div>
+              )}
               <div className="flex items-center gap-2 bg-[#E8EDE5] text-[#2B3229] px-4 py-2 rounded-lg font-bold text-sm">
                 <span className="text-xl text-[#B45309]">
                   <CiCalculator1 />
@@ -210,7 +230,7 @@ export default function RecipeDetail() {
                     disabled={isCalculating}
                     className="text-[#B45309] hover:underline disabled:opacity-50 disabled:no-underline"
                   >
-                    {isCalculating ? "計算中..." : "AIカロリー計算"}
+                    {isCalculating ? "計算中..." : "カロリー計算"}
                   </button>
                 )}
               </div>
