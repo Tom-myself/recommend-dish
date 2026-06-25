@@ -20,7 +20,9 @@ target/
 *.iml
 *.ipr
 
-./kadai.md
+kadai.md
+feature_ideas.md
+permission.md
 
 ### NetBeans ###
 /nbproject/private/
