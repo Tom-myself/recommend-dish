@@ -130,6 +130,67 @@ export default function Home() {
           />
         </div>
 
+        {/* 人気の食材タグ（ingredientsモードのみ） */}
+        {mode === "ingredients" && (
+          <div className="my-8">
+            <p className="text-[#4A634E] text-sm font-bold mb-3 pl-2 flex items-center gap-1">
+              人気の食材を追加
+            </p>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {[
+                "豚肉",
+                "鶏肉",
+                "ひき肉",
+                "キャベツ",
+                "玉ねぎ",
+                "大根",
+                "じゃがいも",
+                "きのこ",
+                "豆腐",
+                "卵",
+              ].map((tag) => {
+                // 手入力された文字列の中にも含まれているか判定
+                const isSelected = query.includes(tag);
+
+                return (
+                  <button
+                    key={tag}
+                    onClick={() => {
+                      if (isSelected) {
+                        // すでにある場合は削除（カンマ区切りを考慮して綺麗に消す）
+                        const newQuery = query
+                          .split("、")
+                          .map((t) => t.trim())
+                          .filter((t) => t !== tag && t !== "")
+                          .join("、");
+                        setQuery(newQuery);
+                      } else {
+                        // ない場合は追加
+                        if (!query) {
+                          setQuery(tag);
+                        } else {
+                          // 末尾が「、」で終わっていなければ「、」を付ける
+                          setQuery(
+                            query + (query.endsWith("、") ? "" : "、") + tag,
+                          );
+                        }
+                      }
+                    }}
+                    disabled={loading}
+                    className={`px-4 py-1.5 border rounded-full text-sm font-bold transition-all disabled:opacity-50 flex items-center gap-1 ${
+                      isSelected
+                        ? "bg-[#166534] text-white border-[#166534] shadow-md transform scale-105"
+                        : "bg-white border-[#D1E0CA] text-[#4A634E] hover:bg-[#F4F7F4] hover:border-[#166534]"
+                    }`}
+                  >
+                    <span>{isSelected ? "✓" : "+"}</span> {tag}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* 調理器具の指定 */}
         <div className="mb-8">
           <p className="text-[#4A634E] text-sm font-bold mb-3 pl-2 flex items-center gap-1">
